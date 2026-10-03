@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 – Page Not Found</title>
+  <meta name="description" content="Ooops! We gone too far. The page you're looking for drifted out of orbit. Return to the home page.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/404-scene.webp" as="image" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <button id="toggle-mode" class="mode-btn" type="button" aria-label="Switch between dark and light fluid mode">
+      <span id="mode-text">Dark Mode</span>
+    </button>
+    <a id="return-home" class="return-home" href="/">
+      <svg aria-hidden="true" viewBox="0 0 16 16" width="12" height="12">
+        <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Return to Home</span>
+    </a>
+  </nav>
+
+  <main class="stage">
+    <!-- Original artwork (orbits, annotations, smoky 404, satellite & moon) with the X and captions removed -->
+    <img class="art" src="assets/404-scene.webp" width="2560" height="1928" fetchpriority="high" decoding="async"
+         alt="The number 404 dissolving into black smoke, with a satellite crashing through the zero in front of the moon, surrounded by faint orbit lines">
+
+    <h1 class="title">Ooops! We gone too far</h1>
+    <p class="subtitle">No signal here!</p>
+  </main>
+  <script src="fluid.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('toggle-mode');
+      const label = document.getElementById('mode-text');
+      let currentMode = 'light';
+      btn?.addEventListener('click', () => {
+        currentMode = currentMode === 'light' ? 'dark' : 'light';
+        if (window.FluidBackground) {
+          window.FluidBackground.setMode(currentMode);
+        }
+        document.body.classList.toggle('theme-dark', currentMode === 'dark');
+        label.textContent = currentMode === 'light' ? 'Dark Mode' : 'Light Mode';
+      });
+    });
+  </script>
+</body>
+</html>
