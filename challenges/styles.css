@@ -1,0 +1,1421 @@
+/**
+ * styles.css — recCTF Challenges Theme
+ * 
+ * ROLE:
+ * Master stylesheet for the challenges board, challenge card grid,
+ * accessible modal dialog, Steins;Gate clockwork backdrop, and live clocks.
+ * 
+ * PALETTE INTEGRITY:
+ * Strictly derived from aaaa/404 copy/styles.css and aaaa/rules copy/styles.css.
+ * No external colors or gradients.
+ */
+
+/* =========================================================================
+   1. CSS Custom Properties (:root & Dark Theme)
+   Values extracted directly from rules copy and 404 copy
+   ========================================================================= */
+:root {
+  /* Core ink & neutral text */
+  --ink: #1c1c1e;
+  --ink-soft: #3a3a3d;
+  --muted: #6e6e72;
+  --line: rgba(20, 20, 22, 0.20);
+  --line-faint: rgba(20, 20, 22, 0.10);
+
+  /* Parchment desaturated surfaces */
+  --paper-1: #efeeea;
+  --paper-2: #e2e1dc;
+  --paper-3: #cfcdc7;
+  --paper-ink: #1f1f21;
+  --paper-muted: #5d5d61;
+
+  /* Steel mechanical components */
+  --steel-1: #2a2a2d;
+  --steel-2: #6f6f74;
+  --steel-3: #d9d9dc;
+  --steel-4: #f4f4f5;
+
+  /* Nixie tube tokens */
+  --tube-bg: #141416;
+  --tube-glow: #f2f2f2;
+  --tube-ghost: rgba(255, 255, 255, 0.06);
+
+  /* Page background */
+  --page-bg: #c8c8c8;
+
+  /* Glassmorphic card surfaces */
+  --card-bg: rgba(255, 255, 255, 0.40);
+  --card-hover: rgba(255, 255, 255, 0.70);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-border-hover: rgba(0, 0, 0, 0.20);
+
+  /* Typography */
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "Share Tech Mono", ui-monospace, monospace;
+  --font-sans: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Time-leap animation constants from rules copy */
+  --unroll: 1.35s;
+  --ease-roll: cubic-bezier(.65, 0, .25, 1);
+}
+
+body.theme-dark {
+  --ink: #ededed;
+  --ink-soft: #cfcfd2;
+  --muted: #8a8a8f;
+  --line: rgba(235, 235, 240, 0.16);
+  --line-faint: rgba(235, 235, 240, 0.08);
+
+  --paper-1: #2a2a2d;
+  --paper-2: #1f1f22;
+  --paper-3: #2f2f33;
+  --paper-ink: #ececee;
+  --paper-muted: #9a9a9f;
+
+  --page-bg: #08080a;
+
+  --card-bg: rgba(20, 20, 22, 0.50);
+  --card-hover: rgba(30, 30, 35, 0.80);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-border-hover: rgba(255, 255, 255, 0.30);
+}
+
+/* =========================================================================
+   2. Base Document Reset & Layout
+   ========================================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--page-bg);
+  min-height: 100%;
+  transition: background-color 0.4s ease;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: color 0.4s ease;
+  overflow-x: hidden;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   3. Steins;Gate Clockwork Backdrop (Imported directly from rules copy)
+   ========================================================================= */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gears {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: fade 2s ease both;
+}
+
+.gears .gear {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin var(--dur, 60s) linear infinite;
+  animation-direction: var(--dir, normal);
+}
+.gears .gear .hub,
+.gears .gear .spoke { stroke: var(--line-faint); }
+
+.gears .annot {
+  fill: var(--muted);
+  font: 9px var(--font-mono);
+  letter-spacing: .12em;
+  opacity: .55;
+}
+.gears .annot-line {
+  stroke: var(--line-faint);
+  stroke-dasharray: 3 4;
+  fill: none;
+}
+
+.clock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vmin, 880px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: .9;
+  animation: rise 1.6s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px) scale(.985); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes spin {
+  to { rotate: 360deg; }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+body.theme-dark .clock {
+  opacity: .7;
+}
+
+/* =========================================================================
+   Component Gears & Section Dividers (Directly from rules copy)
+   ========================================================================= */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  margin-block: 0.8rem 1.4rem;
+  color: var(--line);
+}
+.divider span {
+  flex: 1;
+  max-width: 140px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+}
+.divider .mini-gear {
+  width: 20px;
+  height: 20px;
+  animation: spin 12s linear infinite;
+  color: var(--muted);
+}
+
+.mini-gear {
+  display: inline-block;
+  vertical-align: middle;
+}
+.mini-gear svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.mini-gear path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+.mini-gear circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+.clock-face {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.clock-face .ring-outer { fill: none; stroke: var(--line); stroke-width: 2.4; }
+.clock-face .ring { fill: none; stroke: var(--line); stroke-width: 0.9; }
+.clock-face .ring.thin { stroke: var(--line-faint); }
+.clock-face .ring.dashed { stroke-dasharray: 2 5; }
+.clock-face .tick { stroke: var(--line); stroke-width: 0.8; }
+.clock-face .tick.major { stroke-width: 2; }
+.clock-face .numeral {
+  fill: var(--line);
+  font: 600 20px var(--font-serif);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.clock-face .hand {
+  transform-origin: 0 0;
+  transition: none;
+  will-change: transform;
+}
+.clock-face .hand path { fill: rgba(20, 20, 22, 0.16); stroke: var(--line); stroke-width: 0.8; }
+.clock-face .hand-sec line { stroke: rgba(20, 20, 22, 0.32); stroke-width: 1.2; }
+.clock-face .hand-ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.clock-face .hub { fill: var(--ink-soft); opacity: 0.4; }
+
+body.theme-dark .clock-face .hand path { fill: rgba(235, 235, 240, 0.10); }
+body.theme-dark .clock-face .hand-sec line { stroke: rgba(235, 235, 240, 0.3); }
+
+/* Time-leap whirring matching rules copy */
+.clock.leaping .hand {
+  transition: transform var(--unroll) var(--ease-roll) !important;
+  filter: drop-shadow(0 0 6px var(--line));
+}
+
+/* =========================================================================
+   4. Navigation & Interactable Notification Bell
+   ========================================================================= */
+.top-nav {
+  position: fixed;
+  top: clamp(14px, 3vh, 24px);
+  right: clamp(14px, 2.5vw, 28px);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+  animation: fade-in 0.8s ease both;
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.55em 0.95em;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  font-family: inherit;
+  color: var(--muted);
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 150ms linear, border-color 150ms linear, background-color 150ms linear;
+}
+
+.nav-pill:hover {
+  color: var(--ink);
+  border-color: var(--card-border-hover);
+  background: var(--card-hover);
+}
+
+.nav-pill.active {
+  color: var(--ink);
+  font-weight: 500;
+  border-color: rgba(0, 0, 0, 0.28);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+body.theme-dark .nav-pill.active {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(45, 45, 52, 0.9);
+}
+
+.nav-pill:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.nav-pill svg {
+  transition: transform 150ms linear;
+}
+
+.nav-pill:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Notification Bell & Dropdown */
+.notif-wrapper {
+  position: relative;
+}
+
+.notif-pill {
+  position: relative;
+  cursor: pointer;
+}
+
+.notif-bell-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.notif-pill:hover .notif-bell-icon {
+  transform: rotate(15deg);
+}
+
+.notif-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper-1);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+body.theme-dark .notif-badge {
+  background: var(--paper-ink);
+  color: var(--tube-bg);
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: clamp(290px, 86vw, 360px);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.08), transparent 22px, transparent calc(100% - 22px), rgba(0,0,0,.08)),
+    linear-gradient(180deg, var(--paper-2), var(--paper-1) 25%, var(--paper-1) 75%, var(--paper-2));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.15);
+  color: var(--paper-ink);
+  z-index: 120;
+  overflow: hidden;
+  animation: dropdown-fade-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes dropdown-fade-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.notif-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.notif-gear-mini {
+  width: 14px;
+  height: 14px;
+  color: var(--paper-muted);
+}
+
+.notif-header h4 {
+  margin: 0;
+  font: 600 0.95rem var(--font-serif);
+  letter-spacing: 0.02em;
+}
+
+.notif-clear-btn {
+  background: none;
+  border: none;
+  padding: 3px 7px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--paper-muted);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 150ms linear, background-color 150ms linear;
+}
+
+.notif-clear-btn:hover {
+  color: var(--paper-ink);
+  background: var(--line-faint);
+}
+
+.notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.notif-item {
+  padding: 10px 14px;
+  border-bottom: 1px dashed var(--line);
+  cursor: pointer;
+  transition: background-color 140ms linear;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover,
+.notif-item:focus-visible {
+  background: rgba(0, 0, 0, 0.04);
+  outline: none;
+}
+
+.notif-item.unread {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.notif-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.notif-tag {
+  font: 600 0.7rem var(--font-mono);
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  color: var(--paper-muted);
+}
+
+.notif-tag.critical {
+  border-color: var(--paper-ink);
+  color: var(--paper-ink);
+  font-weight: 700;
+}
+
+.notif-time {
+  font: 0.72rem var(--font-mono);
+  color: var(--paper-muted);
+}
+
+.notif-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--paper-ink);
+}
+
+/* =========================================================================
+   5. Header Band with Smooth Meshing Gears
+   ========================================================================= */
+.header-band {
+  position: relative;
+  z-index: 2;
+  padding-top: clamp(84px, 13vh, 128px);
+  padding-bottom: 2.2rem;
+  text-align: center;
+}
+
+.header-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  position: relative;
+}
+
+.page-title {
+  margin: 0;
+  font: 700 clamp(2.2rem, 5.5vw, 3.2rem) / 1.1 var(--font-serif);
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+
+.header-gear {
+  width: clamp(48px, 6vw, 68px);
+  height: clamp(48px, 6vw, 68px);
+  color: var(--ink);
+  opacity: 0.35;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.header-gear.left-gear {
+  animation: spin-clockwise 90s linear infinite;
+  will-change: transform;
+}
+
+.header-gear.right-gear {
+  animation: spin-counter 90s linear infinite;
+  will-change: transform;
+}
+
+@keyframes spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-counter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* =========================================================================
+   Divergence Meter (Directly from rules copy)
+   ========================================================================= */
+.meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+  animation: rise 1.2s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.tubes {
+  display: flex;
+  gap: clamp(3px, 0.6vw, 6px);
+  padding: 8px 10px 10px;
+  border-radius: 6px;
+  background: linear-gradient(#2b2b2e, #18181a);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 10px 24px -10px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.tube {
+  position: relative;
+  width: clamp(24px, 4.2vw, 36px);
+  height: clamp(40px, 7vw, 60px);
+  border-radius: 40% 40% 8px 8px / 22% 22% 8px 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.10), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.06)),
+    radial-gradient(ellipse at 50% 30%, #222225, var(--tube-bg) 70%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 -6px 10px -6px rgba(255, 255, 255, 0.12) inset;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* grid mesh in front of the cathodes */
+.tube::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px);
+  pointer-events: none;
+}
+
+.tube .ghost,
+.tube .digit {
+  grid-area: 1 / 1;
+  font: 400 clamp(26px, 4.8vw, 42px) / 1 var(--font-mono);
+}
+.tube .ghost { color: var(--tube-ghost); }
+.tube .digit {
+  color: var(--tube-glow);
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 12px rgba(255, 255, 255, 0.55),
+    0 0 26px rgba(255, 255, 255, 0.25);
+  transition: opacity 0.08s linear;
+}
+.tube.flicker .digit { animation: flicker 0.09s steps(2) infinite; }
+
+.tube.is-dot { width: clamp(12px, 2vw, 18px); }
+.tube.is-dot .digit { align-self: end; padding-bottom: 6px; }
+
+.meter-label {
+  margin: 0;
+  display: flex;
+  gap: 0.6em;
+  font: 0.72rem var(--font-mono);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.meter-label .dot { opacity: 0.5; }
+
+/* Shift Flash matching rules copy */
+.shift-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+.shift-flash.on {
+  animation: flash 0.7s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes flash {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  30%  { opacity: 0.2; }
+  42%  { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* =========================================================================
+   6. Alert Slot & Notices
+   ========================================================================= */
+.alert-slot {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.banner-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  border: 1px solid var(--line);
+  background: var(--card-bg);
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.banner-alert-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.banner-alert-close:hover {
+  opacity: 1;
+}
+
+/* =========================================================================
+   7. Challenge Board & Loading State
+   Reduced pace of the loading gear above the synchronizing text to 14s
+   ========================================================================= */
+.stage {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 32px) 96px;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 5rem 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* Reduced pace: calm, deliberate 14s cycle */
+.loading-gear {
+  width: 38px;
+  height: 38px;
+  color: var(--ink);
+  animation: spin-clockwise 14s linear infinite;
+  will-change: transform;
+}
+
+/* =========================================================================
+   8. Category Sections & Grid
+   ========================================================================= */
+.category-section {
+  margin-bottom: 3.2rem;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+  font: 600 clamp(1.4rem, 3.2vw, 1.75rem) var(--font-serif);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 0.6rem;
+}
+
+.category-gear-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.challenges-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 576px) {
+  .challenges-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .challenges-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .challenges-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* =========================================================================
+   9. Challenge Cards
+   ========================================================================= */
+.challenge-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 124px;
+  padding: 1.6rem 1.2rem;
+  border-radius: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  overflow: hidden;
+}
+
+.challenge-card:hover {
+  background: var(--card-hover);
+  border-color: var(--card-border-hover);
+  transform: translateY(-2px);
+}
+
+.challenge-card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  background: var(--card-hover);
+  border-color: var(--card-border-hover);
+}
+
+.card-title {
+  margin: 0;
+  font-weight: 500;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.card-points {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  opacity: 0.75;
+  letter-spacing: 0.05em;
+}
+
+.card-corner-gear {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  opacity: 0.55;
+  transform: rotate(0deg);
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.challenge-card:not(.solved):hover .card-corner-gear,
+.challenge-card:not(.solved):focus-visible .card-corner-gear {
+  transform: rotate(45deg);
+  opacity: 0.95;
+}
+
+.challenge-card.solved {
+  background: var(--ink);
+  color: var(--paper-1);
+  border-color: var(--ink);
+}
+
+body.theme-dark .challenge-card.solved {
+  background: var(--paper-ink);
+  color: var(--tube-bg);
+  border-color: var(--paper-ink);
+}
+
+.challenge-card.solved .card-corner-gear {
+  color: currentColor;
+  opacity: 0.55;
+  transform: rotate(18deg);
+  transition: none;
+}
+
+.challenge-card.solved:hover .card-corner-gear,
+.challenge-card.solved:focus-visible .card-corner-gear {
+  transform: rotate(18deg);
+}
+
+/* =========================================================================
+   10. Accessible Challenge Modal (<dialog closedby="any">)
+   ========================================================================= */
+dialog#challenge-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  max-width: 640px;
+  width: calc(100vw - 32px);
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--paper-ink);
+  box-shadow: 0 18px 42px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+dialog#challenge-modal::backdrop {
+  background-color: rgba(14, 14, 16, 0.68);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-dialog-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.08), transparent 22px, transparent calc(100% - 22px), rgba(0,0,0,.08)),
+    linear-gradient(90deg, rgba(0,0,0,.05), transparent 8%, transparent 92%, rgba(0,0,0,.05)),
+    linear-gradient(180deg, var(--paper-2), var(--paper-1) 25%, var(--paper-1) 75%, var(--paper-2));
+  color: var(--paper-ink);
+  overflow: hidden;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper-1);
+  color: var(--paper-muted);
+  cursor: pointer;
+  z-index: 10;
+  transition: color 150ms linear, border-color 150ms linear;
+}
+
+.modal-close-btn:hover {
+  color: var(--paper-ink);
+  border-color: var(--paper-ink);
+}
+
+.modal-close-btn:focus-visible {
+  outline: 2px solid var(--paper-ink);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   11. Modal Tabs & Smooth Steins;Gate Notch Gear
+   ========================================================================= */
+.modal-header-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0;
+  border-bottom: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.tabs-nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--paper-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms linear, border-color 150ms linear;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--paper-ink);
+}
+
+.tab-btn[aria-selected="true"] {
+  color: var(--paper-ink);
+  border-bottom-color: var(--paper-ink);
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--paper-ink);
+  outline-offset: -2px;
+}
+
+.tab-notch-gear {
+  width: 22px;
+  height: 22px;
+  color: var(--paper-muted);
+  flex-shrink: 0;
+  margin-right: 36px;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+/* =========================================================================
+   12. Modal Content & Mini Steins;Gate Clock in Challenge Tab
+   ========================================================================= */
+.modal-body-content {
+  padding: clamp(20px, 4vw, 32px);
+  max-height: min(72vh, 620px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.challenge-header-emblem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.4rem;
+}
+
+.mini-clock {
+  width: 60px;
+  height: 60px;
+  opacity: 0.85;
+}
+
+.mini-clock-face {
+  width: 100%;
+  height: 100%;
+}
+
+.challenge-name {
+  margin: 0;
+  text-align: center;
+  font: 700 clamp(1.6rem, 3.8vw, 2.1rem) / 1.15 var(--font-serif);
+  letter-spacing: 0.02em;
+}
+
+.challenge-points {
+  margin: 0;
+  text-align: center;
+  font: 600 1.2rem var(--font-mono);
+  color: var(--paper-muted);
+}
+
+.challenge-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.tag-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font: 0.78rem var(--font-mono);
+  letter-spacing: 0.04em;
+  background: var(--line-faint);
+  border: 1px solid var(--line);
+  color: var(--paper-muted);
+}
+
+.challenge-author {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font: italic 0.88rem var(--font-serif);
+  color: var(--paper-muted);
+}
+
+.challenge-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.4rem;
+  color: var(--paper-ink);
+}
+
+.challenge-desc code,
+.rules code {
+  font: 0.85rem var(--font-mono);
+  padding: 0.08em 0.38em;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.theme-dark .challenge-desc code {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.challenge-desc pre {
+  margin: 0.8rem 0;
+  padding: 10px 14px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.challenge-connection {
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+.challenge-connection code {
+  font: 0.92rem var(--font-mono);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  user-select: all;
+}
+
+.challenge-connection a {
+  font: 0.92rem var(--font-mono);
+  color: var(--paper-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Hints */
+.challenge-hints {
+  margin-bottom: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.challenge-hints details {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.challenge-hints summary {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--paper-ink);
+}
+
+.challenge-hints summary:focus-visible {
+  outline: 2px solid var(--paper-ink);
+  outline-offset: 2px;
+}
+
+.hint-content-body {
+  padding-top: 10px;
+  font-size: 0.9rem;
+  border-top: 1px dashed var(--line);
+  margin-top: 8px;
+}
+
+.unlock-hint-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper-1);
+  color: var(--paper-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.unlock-hint-btn:hover {
+  background: var(--paper-3);
+}
+
+/* Files */
+.challenge-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+  justify-content: center;
+}
+
+.file-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper-2);
+  color: var(--paper-ink);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  transition: background-color 150ms linear;
+}
+
+.file-download-btn:hover {
+  background: var(--paper-3);
+}
+
+/* Attempts Limit Indicator */
+.attempts-counter {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--paper-muted);
+  margin-bottom: 1rem;
+}
+
+/* Flag Submission Form */
+.submit-form-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.flag-input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper-2);
+  color: var(--paper-ink);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+.flag-input:focus {
+  outline: 2px solid var(--paper-ink);
+  border-color: transparent;
+}
+
+.flag-submit-btn {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 5px;
+  background: var(--steel-1);
+  color: var(--paper-1);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 150ms linear;
+  min-width: 90px;
+}
+
+.flag-submit-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.flag-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Submission Result Alerts */
+.submit-result-alert {
+  padding: 10px 14px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border: 1px solid var(--line);
+}
+
+.submit-result-alert.correct {
+  background: var(--paper-ink);
+  color: var(--paper-1);
+  border-color: var(--paper-ink);
+}
+
+body.theme-dark .submit-result-alert.correct {
+  background: var(--tube-bg);
+  color: var(--tube-glow);
+  border-color: var(--tube-glow);
+}
+
+.submit-result-alert.incorrect {
+  background: var(--paper-2);
+  color: var(--paper-ink);
+  border: 2px solid var(--paper-ink);
+}
+
+.submit-result-alert.info {
+  background: var(--paper-2);
+  color: var(--paper-muted);
+}
+
+.submit-result-alert.shake {
+  animation: shake 150ms ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.gear-lock-icon {
+  width: 18px;
+  height: 18px;
+  animation: gear-click-lock 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  will-change: transform;
+}
+
+@keyframes gear-click-lock {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+/* Next Challenge Button */
+.btn-next-challenge {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--paper-ink);
+  border-radius: 5px;
+  background: var(--paper-1);
+  color: var(--paper-ink);
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 150ms linear;
+}
+
+.btn-next-challenge:hover {
+  background: var(--paper-3);
+}
+
+/* =========================================================================
+   13. Submissions & Solves Data Tables
+   ========================================================================= */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px dashed var(--line);
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+
+.flag-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flag-cell code {
+  font-family: var(--font-mono);
+}
+
+.btn-mask-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--paper-muted);
+  cursor: pointer;
+}
+
+.btn-mask-toggle:hover {
+  color: var(--paper-ink);
+}
+
+.solution-content {
+  padding: 1rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* =========================================================================
+   14. Reduced Motion & Performance
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
