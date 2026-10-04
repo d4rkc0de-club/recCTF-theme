@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rules – recCTF</title>
-  <meta name="description" content="The rules of the world line. Unroll the scroll to read the recCTF rules before you begin.">
+  <meta name="description"
+    content="The rules of the world line. Unroll the scroll to read the recCTF rules before you begin.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <!-- Clockwork backdrop: gears + clock face (decorative) -->
   <div class="backdrop" aria-hidden="true">
@@ -17,16 +22,24 @@
 
     <div class="clock" id="clock">
       <svg viewBox="-200 -200 400 400" class="clock-face">
-        <circle r="196" class="ring-outer"/>
-        <circle r="188" class="ring"/>
-        <circle r="150" class="ring thin"/>
-        <circle r="62" class="ring thin dashed"/>
+        <circle r="196" class="ring-outer" />
+        <circle r="188" class="ring" />
+        <circle r="150" class="ring thin" />
+        <circle r="62" class="ring thin dashed" />
         <g id="clock-ticks"></g>
         <g id="clock-numerals"></g>
-        <g class="hand hand-hour" id="hand-hour"><path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z"/><circle r="12" class="hand-ring"/></g>
-        <g class="hand hand-min" id="hand-min"><path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z"/></g>
-        <g class="hand hand-sec" id="hand-sec"><line y1="34" y2="-172"/><circle cy="-130" r="6" class="hand-ring"/></g>
-        <circle r="6" class="hub"/>
+        <g class="hand hand-hour" id="hand-hour">
+          <path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z" />
+          <circle r="12" class="hand-ring" />
+        </g>
+        <g class="hand hand-min" id="hand-min">
+          <path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z" />
+        </g>
+        <g class="hand hand-sec" id="hand-sec">
+          <line y1="34" y2="-172" />
+          <circle cy="-130" r="6" class="hand-ring" />
+        </g>
+        <circle r="6" class="hub" />
       </svg>
     </div>
   </div>
@@ -39,7 +52,8 @@
     </button>
     <a id="return-home" class="return-home" href="/">
       <svg aria-hidden="true" viewBox="0 0 16 16" width="12" height="12">
-        <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
       </svg>
       <span>Return to Home</span>
     </a>
@@ -49,13 +63,14 @@
     <!-- Divergence meter -->
     <section class="meter" aria-label="World line divergence">
       <div class="tubes" id="tubes" role="img" aria-label="Divergence 0.571024"></div>
-      <p class="meter-label"><span id="worldline-name">α World Line</span><span class="dot">·</span><span>Divergence</span></p>
+      <p class="meter-label"><span id="worldline-name">α World Line</span><span
+          class="dot">·</span><span>Divergence</span></p>
     </section>
 
     <!-- The scroll -->
     <div class="scroll" id="scroll">
-      <button class="roller roller-top" id="scroll-toggle" type="button"
-              aria-expanded="false" aria-controls="scroll-paper">
+      <button class="roller roller-top" id="scroll-toggle" type="button" aria-expanded="false"
+        aria-controls="scroll-paper">
         <span class="visually-hidden" id="toggle-label">Unroll the rules</span>
         <span class="knob knob-l" aria-hidden="true"></span>
         <span class="knob knob-r" aria-hidden="true"></span>
@@ -74,23 +89,28 @@
             <ol class="rules">
               <li>
                 <h2>The Flag Format</h2>
-                <p>All flags look like <code>recCTF{...}</code> unless a challenge says otherwise. Submit them exactly as found.</p>
+                <p>All flags look like <code>recCTF{...}</code> unless a challenge says otherwise. Submit them exactly
+                  as found.</p>
               </li>
               <li>
                 <h2>Touch Only the Targets</h2>
-                <p>Attack the challenges, never the platform. The scoreboard, servers and other players are outside the experiment.</p>
+                <p>Attack the challenges, never the platform. The scoreboard, servers and other players are outside the
+                  experiment.</p>
               </li>
               <li>
                 <h2>No D-Mails Between Teams</h2>
-                <p>Sharing flags, hints or solutions with other teams is forbidden. What happens in your lab stays in your lab.</p>
+                <p>Sharing flags, hints or solutions with other teams is forbidden. What happens in your lab stays in
+                  your lab.</p>
               </li>
               <li>
                 <h2>No Brute-Forcing the Gate</h2>
-                <p>Don't spam flag submissions or run heavy automated scanners against the infrastructure unless a challenge asks for it.</p>
+                <p>Don't spam flag submissions or run heavy automated scanners against the infrastructure unless a
+                  challenge asks for it.</p>
               </li>
               <li>
                 <h2>One Lab, One Account</h2>
-                <p>Each team plays from a single account. Multiple accounts to gain an advantage leads to disqualification.</p>
+                <p>Each team plays from a single account. Multiple accounts to gain an advantage leads to
+                  disqualification.</p>
               </li>
               <li>
                 <h2>Keep the Timeline Intact</h2>
@@ -120,7 +140,8 @@
     <p class="hint" id="hint" aria-hidden="true">Tap the scroll to unroll</p>
   </main>
 
-  <script src="../fluid.js" defer></script>
+  <script src="fluid.js" defer></script>
   <script src="script.js" defer></script>
 </body>
+
 </html>
