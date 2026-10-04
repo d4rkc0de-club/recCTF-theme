@@ -52,7 +52,7 @@
 
   // Strictly grey: one scalar per mode, used for R, G and B alike.
   const PALETTES = {
-    dark:  { bg: 0x08 / 255, ink: 0xd0 / 255, css: '#08080a' },
+    dark:  { bg: 0x08 / 255, ink: 0xd0 / 255, css: '#080808' },
     light: { bg: 0xc8 / 255, ink: 0x0a / 255, css: '#c8c8c8' },
   };
   const palette = () => PALETTES[CONFIG.mode] || PALETTES.dark;

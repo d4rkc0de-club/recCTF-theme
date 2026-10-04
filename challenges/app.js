@@ -445,12 +445,7 @@ function initSteinsGateClock() {
 
   window.triggerClockwiseSnapTo12 = triggerClockwiseSnapTo12;
 
-  // When a click is registered anywhere: rotate quickly to 12:00 in clockwise direction
-  document.addEventListener('click', () => {
-    // Avoid triggering if selecting text
-    if (String(window.getSelection()).length > 0) return;
-    triggerClockwiseSnapTo12();
-  });
+
 }
 
 /* =========================================================================
@@ -990,6 +985,8 @@ function setupEventListeners() {
       handleFlagSubmission();
     }
   });
+
+
 
   window.addEventListener('hashchange', handleHashNavigation);
 }

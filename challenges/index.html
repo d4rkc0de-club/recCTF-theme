@@ -23,7 +23,7 @@
   <!-- Low-Intensity Fluid Background Configuration -->
   <script>
     window.FLUID_CONFIG = {
-      mode: 'light',
+      mode: 'dark',
       splatRadius: 0.022,        // Halved radius for tighter, subtle displacement
       splatForce: 0.45,          // Reduced velocity force
       dyeAmount: 0.14,           // Low smoke density for minimal intensity
@@ -36,7 +36,7 @@
   </script>
   <script src="fluid.js" defer></script>
 </head>
-<body>
+<body class="theme-dark">
   <!-- Clockwork backdrop: gears + clock face (decorative) directly from rules copy -->
   <div class="backdrop" aria-hidden="true">
     <svg id="gears" class="gears" preserveAspectRatio="xMidYMid slice"></svg>
@@ -179,15 +179,6 @@
       </svg>
     </div>
 
-    <!-- Divergence Meter (Directly from rules copy) -->
-    <section class="meter" aria-label="World line divergence">
-      <div class="tubes" id="tubes" role="img" aria-label="Divergence 0.571024"></div>
-      <p class="meter-label">
-        <span id="worldline-name">α World Line</span>
-        <span class="dot">·</span>
-        <span>Divergence</span>
-      </p>
-    </section>
   </header>
 
   <!-- Alert Slot for dismissible board-level messages -->

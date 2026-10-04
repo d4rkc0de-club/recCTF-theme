@@ -16,27 +16,27 @@
    ========================================================================= */
 :root {
   /* Core ink & neutral text */
-  --ink: #1c1c1e;
-  --ink-soft: #3a3a3d;
-  --muted: #6e6e72;
-  --line: rgba(20, 20, 22, 0.20);
-  --line-faint: rgba(20, 20, 22, 0.10);
+  --ink: #1c1c1c;
+  --ink-soft: #3a3a3a;
+  --muted: #6e6e6e;
+  --line: rgba(20, 20, 20, 0.20);
+  --line-faint: rgba(20, 20, 20, 0.10);
 
   /* Parchment desaturated surfaces */
-  --paper-1: #efeeea;
-  --paper-2: #e2e1dc;
-  --paper-3: #cfcdc7;
-  --paper-ink: #1f1f21;
-  --paper-muted: #5d5d61;
+  --paper-1: #eeeeee;
+  --paper-2: #e0e0e0;
+  --paper-3: #cccccc;
+  --paper-ink: #1f1f1f;
+  --paper-muted: #5d5d5d;
 
   /* Steel mechanical components */
-  --steel-1: #2a2a2d;
-  --steel-2: #6f6f74;
-  --steel-3: #d9d9dc;
-  --steel-4: #f4f4f5;
+  --steel-1: #2a2a2a;
+  --steel-2: #6f6f6f;
+  --steel-3: #d9d9d9;
+  --steel-4: #f4f4f4;
 
   /* Nixie tube tokens */
-  --tube-bg: #141416;
+  --tube-bg: #141414;
   --tube-glow: #f2f2f2;
   --tube-ghost: rgba(255, 255, 255, 0.06);
 
@@ -60,24 +60,36 @@
 }
 
 body.theme-dark {
-  --ink: #ededed;
-  --ink-soft: #cfcfd2;
-  --muted: #8a8a8f;
-  --line: rgba(235, 235, 240, 0.16);
-  --line-faint: rgba(235, 235, 240, 0.08);
+  /* High contrast vivid dark theme - Strict Opposite */
+  --ink: #e3e3e3; /* Opposite of #1c1c1c */
+  --ink-soft: #c5c5c5; /* Opposite of #3a3a3a */
+  --muted: #919191; /* Opposite of #6e6e6e */
+  --line: rgba(235, 235, 235, 0.20); /* Opposite of rgba(20, 20, 20, 0.20) */
+  --line-faint: rgba(235, 235, 235, 0.10);
 
-  --paper-1: #2a2a2d;
-  --paper-2: #1f1f22;
-  --paper-3: #2f2f33;
-  --paper-ink: #ececee;
-  --paper-muted: #9a9a9f;
+  --paper-1: #111111; /* Opposite of #eeeeee */
+  --paper-2: #1f1f1f; /* Opposite of #e0e0e0 */
+  --paper-3: #333333; /* Opposite of #cccccc */
+  --paper-ink: #e0e0e0; /* Opposite of #1f1f1f */
+  --paper-muted: #a2a2a2; /* Opposite of #5d5d5d */
 
-  --page-bg: #08080a;
+  /* Steel mechanical components */
+  --steel-1: #d5d5d5; /* Opposite of #2a2a2a */
+  --steel-2: #909090; /* Opposite of #6f6f6f */
+  --steel-3: #262626; /* Opposite of #d9d9d9 */
+  --steel-4: #0b0b0b; /* Opposite of #f4f4f4 */
 
-  --card-bg: rgba(20, 20, 22, 0.50);
-  --card-hover: rgba(30, 30, 35, 0.80);
-  --card-border: rgba(255, 255, 255, 0.12);
-  --card-border-hover: rgba(255, 255, 255, 0.30);
+  /* Nixie tube tokens */
+  --tube-bg: #ebebeb; /* Opposite of #141414 */
+  --tube-glow: #0d0d0d; /* Opposite of #f2f2f2 */
+  --tube-ghost: rgba(0, 0, 0, 0.06); /* Opposite of rgba(255,255,255,0.06) */
+
+  --page-bg: rgb(8, 8, 8); /* Keep user's requested pitch black but strictly monotone */
+
+  --card-bg: rgba(0, 0, 0, 0.40); /* Opposite of rgba(255, 255, 255, 0.40) */
+  --card-hover: rgba(0, 0, 0, 0.70); /* Opposite of rgba(255, 255, 255, 0.70) */
+  --card-border: rgba(255, 255, 255, 0.08); /* Opposite of rgba(0, 0, 0, 0.08) */
+  --card-border-hover: rgba(255, 255, 255, 0.20); /* Opposite of rgba(0, 0, 0, 0.20) */
 }
 
 /* =========================================================================
@@ -260,8 +272,8 @@ body.theme-dark .clock {
 .clock-face .hand-ring { fill: none; stroke: var(--line); stroke-width: 1; }
 .clock-face .hub { fill: var(--ink-soft); opacity: 0.4; }
 
-body.theme-dark .clock-face .hand path { fill: rgba(235, 235, 240, 0.10); }
-body.theme-dark .clock-face .hand-sec line { stroke: rgba(235, 235, 240, 0.3); }
+body.theme-dark .clock-face .hand path { fill: rgba(255, 255, 255, 0.25); }
+body.theme-dark .clock-face .hand-sec line { stroke: rgba(255, 255, 255, 0.6); }
 
 /* Time-leap whirring matching rules copy */
 .clock.leaping .hand {
@@ -316,9 +328,9 @@ body.theme-dark .clock-face .hand-sec line { stroke: rgba(235, 235, 240, 0.3); }
 }
 
 body.theme-dark .nav-pill.active {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(45, 45, 52, 0.9);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(60, 60, 70, 0.95);
 }
 
 .nav-pill:focus-visible {
@@ -877,9 +889,9 @@ body.theme-dark .notif-badge {
 }
 
 body.theme-dark .challenge-card.solved {
-  background: var(--paper-ink);
-  color: var(--tube-bg);
-  border-color: var(--paper-ink);
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .challenge-card.solved .card-corner-gear {
@@ -1107,8 +1119,9 @@ dialog#challenge-modal::backdrop {
 }
 
 body.theme-dark .challenge-desc code {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 .challenge-desc pre {
@@ -1418,4 +1431,58 @@ body.theme-dark .submit-result-alert.correct {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* =========================================================================
+   Strict Dark Theme Inversions (Hardcoded colors)
+   ========================================================================= */
+/* Invert modal shadows & gradients */
+body.theme-dark .modal-dialog-inner {
+  box-shadow: 0 18px 42px -12px rgba(255, 255, 255, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.35);
+  background-color: rgba(241, 241, 239, 0.68); /* Opposite of rgba(14, 14, 16, 0.68) */
+}
+
+/* Modal body gradients */
+body.theme-dark .modal-body-content {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 22px, transparent calc(100% - 22px), rgba(255,255,255,.08)),
+    linear-gradient(90deg, rgba(255,255,255,.05), transparent 8%, transparent 92%, rgba(255,255,255,.05)),
+    linear-gradient(180deg, var(--paper-1) 0%, var(--paper-2) 100%);
+}
+
+body.theme-dark .modal-header-tabs {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Invert notification dropdown */
+body.theme-dark .notif-dropdown {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 22px, transparent calc(100% - 22px), rgba(255,255,255,.08)),
+    linear-gradient(180deg, var(--paper-2), var(--paper-1) 25%, var(--paper-1) 75%, var(--paper-2));
+  box-shadow: 0 16px 36px -10px rgba(255, 255, 255, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+body.theme-dark .notif-header {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.theme-dark .notif-item:hover,
+body.theme-dark .notif-item:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+body.theme-dark .notif-item.unread {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Challenge desc inline code */
+body.theme-dark .challenge-desc code {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+/* Shift flash */
+body.theme-dark .shift-flash {
+  background: #000000;
 }
