@@ -38,7 +38,6 @@
                   method="post" accept-charset="utf-8" autocomplete="off" role="form"
                   x-data="SettingsForm"
                   @submit.prevent="updateProfile()"
-                  class="form-horizontal"
               >
 
                 <div class="mb-3">
@@ -100,7 +99,7 @@
 
                   <template x-for="(msg, idx) in errors" :key="idx">
                     <div class="alert alert-danger alert-dismissible" role="alert">
-                      <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
+                      <span class="visually-hidden">{% trans %}Error:{% endtrans %}</span>
                       <span x-text="msg"></span>
                       <button
                           type="button" class="btn-close" data-bs-dismiss="alert"
@@ -171,7 +170,7 @@
 
                 <div class="row">
                   <div class="col">
-                    {{ form.submit(class="btn btn-block btn-primary float-end px-4") }}
+                    {{ form.submit(class="btn btn-primary float-end px-4") }}
                   </div>
                 </div>
               </form>

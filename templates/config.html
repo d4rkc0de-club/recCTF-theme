@@ -1,7 +1,7 @@
 <form>
-  <div class="form-group">
+  <div class="mb-3">
     <label>Challenge Window Size</label>
-    <select class="form-control custom-select" name="challenge_window_size">
+    <select class="form-select" name="challenge_window_size">
         <option value="sm">Small</option>
         <option value="norm">Normal</option>
         <option value="lg">Large</option>
@@ -9,7 +9,7 @@
     </select>
   </div>
 
-  <div class="form-group">
+  <div class="mb-3">
     <label>
       Challenge Category Order Custom Function<br>
       <small class="form-text text-muted">
@@ -17,10 +17,10 @@
         used to sort the challenge categories
       </small>
     </label>
-    <textarea class="form-control text-monospace" name="challenge_category_order" rows="5"></textarea>
+    <textarea class="form-control font-monospace" name="challenge_category_order" rows="5"></textarea>
   </div>
 
-  <div class="form-group">
+  <div class="mb-3">
     <label>
       Challenge Order Custom Function<br>
       <small class="form-text text-muted">
@@ -28,7 +28,7 @@
         used to sort the challenges within categories
       </small>
     </label>
-    <textarea class="form-control text-monospace" name="challenge_order" rows="5"></textarea>
+    <textarea class="form-control font-monospace" name="challenge_order" rows="5"></textarea>
   </div>
 
   <div>
@@ -43,5 +43,5 @@
     </small>
   </div>
 
-  <button type="submit" class="btn btn-primary float-right mt-4">Update</button>
+  <button type="submit" class="btn btn-primary float-end mt-4">Update</button>
 </form>

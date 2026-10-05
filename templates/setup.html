@@ -35,7 +35,7 @@
 				method="post" 
 				accept-charset="utf-8" 
 				autocomplete="off" 
-				role="form" class="form-horizontal" 
+				role="form" 
 				id="setup-form" 
 				enctype="multipart/form-data"
 			>
@@ -81,7 +81,7 @@
 							</small>
 						</div>
 
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#mode" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -133,7 +133,7 @@
 							</div>
 						</div>
 
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#settings" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -151,7 +151,7 @@
 									{{ form.challenge_visibility.label }}
 									<i class="far fa-question float-end text-muted" data-bs-toggle="tooltip" data-bs-title="{{ form.challenge_visibility.description }}"></i>
 								</b>
-								{{ form.challenge_visibility(class="form-control custom-select") }}
+								{{ form.challenge_visibility(class="form-select") }}
 							</div>
 
 							<div class="col-md-3 mb-3">
@@ -159,7 +159,7 @@
 									{{ form.account_visibility.label }}
 									<i class="far fa-question float-end text-muted" data-bs-toggle="tooltip" data-bs-title="{{ form.account_visibility.description }}"></i>
 								</b>
-								{{ form.account_visibility(class="form-control custom-select") }}
+								{{ form.account_visibility(class="form-select") }}
 							</div>
 
 							<div class="col-md-3 mb-3">
@@ -167,7 +167,7 @@
 									{{ form.score_visibility.label }}
 									<i class="far fa-question float-end text-muted" data-bs-toggle="tooltip" data-bs-title="{{ form.score_visibility.description }}"></i>
 								</b>
-								{{ form.score_visibility(class="form-control custom-select") }}
+								{{ form.score_visibility(class="form-select") }}
 							</div>
 
 							<div class="col-md-3 mb-3">
@@ -175,7 +175,7 @@
 									{{ form.registration_visibility.label }}
 									<i class="far fa-question float-end text-muted" data-bs-toggle="tooltip" data-bs-title="{{ form.registration_visibility.description }}"></i>
 								</b>
-								{{ form.registration_visibility(class="form-control custom-select") }}
+								{{ form.registration_visibility(class="form-select") }}
 							</div>
 						</div>
 
@@ -183,7 +183,7 @@
 
 						<div class="mb-3">
 							<b>{{ form.verify_emails.label }}</b>
-							{{ form.verify_emails(class="form-control custom-select") }}
+							{{ form.verify_emails(class="form-select") }}
 							<small class="form-text text-muted">
 								{{ form.verify_emails.description }}
 							</small>
@@ -191,13 +191,13 @@
 
 						<div class="mb-3">
 							<b>{{ form.team_size.label }}</b>
-							{{ form.team_size(class="form-control custom-select") }}
+							{{ form.team_size(class="form-select") }}
 							<small class="form-text text-muted">
 								{{ form.team_size.description }}
 							</small>
 						</div>
 
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#administration" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -233,7 +233,7 @@
 							</label>
 						</div>
 
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#style" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -243,7 +243,7 @@
 						<div class="mb-3">
 							<b>{{ form.ctf_logo.label }}</b>
 							<div class="row">
-								{{ form.ctf_logo(class="form-control-file", accept="image/*", **{'@change': 'validateFileSize($event, 128000)'}) }}
+								{{ form.ctf_logo(class="form-control", accept="image/*", **{'@change': 'validateFileSize($event, 128000)'}) }}
 								<small class="form-text text-muted">
 									{{ form.ctf_logo.description }}
 								</small>
@@ -252,7 +252,7 @@
 						<div class="mb-3">
 							<b>{{ form.ctf_banner.label }}</b>
 							<div class="row">
-								{{ form.ctf_banner(class="form-control-file", accept="image/*", **{'@change': 'validateFileSize($event, 512000)'}) }}
+								{{ form.ctf_banner(class="form-control", accept="image/*", **{'@change': 'validateFileSize($event, 512000)'}) }}
 								<small class="form-text text-muted">
 									{{ form.ctf_banner.description }}
 								</small>
@@ -261,7 +261,7 @@
 						<div class="mb-3">
 							<b>{{ form.ctf_small_icon.label }}</b>
 							<div class="row">
-								{{ form.ctf_small_icon(class="form-control-file", accept=".png", **{'@change': 'validateFileSize($event, 32000)'}) }}
+								{{ form.ctf_small_icon(class="form-control", accept=".png", **{'@change': 'validateFileSize($event, 32000)'}) }}
 								<small class="form-text text-muted">
 									{{ form.ctf_small_icon.description }}
 								</small>
@@ -269,7 +269,7 @@
 						</div>
 						<div class="mb-3">
 							<b>{{ form.ctf_theme.label }}</b>
-							{{ form.ctf_theme(class="form-control custom-select") }}
+							{{ form.ctf_theme(class="form-select") }}
 							<small class="form-text text-muted">
 								{{ form.ctf_theme.description }}
 							</small>
@@ -280,7 +280,7 @@
 								<div class="d-inline-block">
 									{{ form.theme_color(id="config-color-input") }}
 									<div class="btn-group">
-										<input type="color" id="config-color-picker" class="pr-1" style="width: 100px; height: 30px;" value="" @input="setThemeColor">
+										<input type="color" id="config-color-picker" class="pe-1" style="width: 100px; height: 30px;" value="" @input="setThemeColor">
 									</div>
 									<div class="btn-group">
 										<button type="button" id="config-color-reset" @click="resetThemeColor">Reset</button>
@@ -291,7 +291,7 @@
 								</small>
 							</div>
 						</div>
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#datetime" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -340,7 +340,7 @@
 							</small>
 						</div>
 
-						<div class="text-right float-end">
+						<div class="float-end">
 							<button type="button" class="btn btn-primary btn-outlined tab-next" data-href="#integrations" @click="switchTab">
 								{% trans %}Next{% endtrans %}
 							</button>
@@ -349,7 +349,7 @@
 					<div class="tab-pane fade" id="integrations" role="tabpanel">
 						<div class="mb-3">
 							<b>{{ form.social_shares.label }}</b>
-							{{ form.social_shares(class="form-control custom-select") }}
+							{{ form.social_shares(class="form-select") }}
 							<small class="form-text text-muted">
 								{{ form.social_shares.description }}
 							</small>
@@ -357,7 +357,7 @@
 						<div class="mb-3">
 							<b>MajorLeagueCyber Integration</b>
 							<p>MajorLeagueCyber (MLC) is a cyber security event tracker written and maintained by the developers of CTFd.</p>
-							<button type="button" id="integration-mlc" class="btn btn-primary btn-block" @click="mlcSetup()">
+							<button type="button" id="integration-mlc" class="btn btn-primary w-100" @click="mlcSetup()">
 								Setup
 							</button>
 						</div>
@@ -366,7 +366,7 @@
 						<hr>
 						<br>
 
-						<div class="submit-row text-right float-end">
+						<div class="submit-row float-end">
 							{{ form.submit(class="btn btn-md btn-primary btn-outlined") }}
 						</div>
 					</div>

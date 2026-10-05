@@ -15,7 +15,7 @@
         {% include "components/errors.html" %}
 
         {% if integrations.mlc() %}
-          <a class="btn btn-secondary btn-lg btn-block w-100" href="{{ url_for('auth.oauth_login') }}">
+          <a class="btn btn-secondary btn-lg w-100" href="{{ url_for('auth.oauth_login') }}">
             Login with Major League Cyber
           </a>
 
@@ -48,7 +48,7 @@
               </div>
 
               <div class="col-6 col-md-4">
-                {{ form.submit(class="btn btn-block btn-primary w-100") }}
+                {{ form.submit(class="btn btn-primary w-100") }}
               </div>
             </div>
 

@@ -80,7 +80,7 @@
 
                 <template x-for="(msg, idx) in errors" :key="idx">
                   <div class="alert alert-danger alert-dismissible" role="alert">
-                    <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
+                    <span class="visually-hidden">{% trans %}Error:{% endtrans %}</span>
                     <span x-text="msg"></span>
 
                     <button type="button" class="cursor-pointer btn-close" data-bs-dismiss="alert" aria-label="Close">
@@ -130,7 +130,7 @@
                 </div>
                 <template x-for="(msg, idx) in errors" :key="idx">
                   <div class="alert alert-danger alert-dismissible" role="alert">
-                    <span class="sr-only">Error:</span>
+                    <span class="visually-hidden">Error:</span>
                     <span x-text="msg"></span>
                     <button type="button" class="cursor-pointer btn-close" data-bs-dismiss="alert" aria-label="Close">
                     </button>
@@ -195,7 +195,7 @@
           <div class="mt-3">
             <template x-for="(msg, idx) in errors" :key="idx">
               <div class="alert alert-danger" role="alert">
-                <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
+                <span class="visually-hidden">{% trans %}Error:{% endtrans %}</span>
                 <span x-text="msg"></span>
               </div>
             </template>
@@ -305,7 +305,7 @@
           <a href="{{ team.website }}" target="_blank" style="color: inherit;" rel="noopener">
             <i
                 class="fas fa-external-link-alt fa-2x px-2 pt-2"
-                data-toggle="tooltip" data-placement="top"
+                data-bs-toggle="tooltip" data-bs-placement="top"
                 title="{{ team.website }}"
             ></i>
           </a>

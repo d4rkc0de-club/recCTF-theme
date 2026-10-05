@@ -76,7 +76,7 @@
                 {% if user.website and (user.website.startswith('http://') or user.website.startswith('https://')) %}
                   <a href="{{ user.website }}" target="_blank" rel="noopener">
                     <i
-                        class="fas fa-external-link-alt" data-toggle="tooltip" data-placement="top"
+                        class="fas fa-external-link-alt" data-bs-toggle="tooltip" data-bs-placement="top"
                         title="{{ user.website }}"
                     ></i>
                   </a>
@@ -86,7 +86,7 @@
               <td class="d-none d-md-table-cell d-lg-table-cell">
                 {% if user.affiliation %}
                   {% if user.affiliation | length > 50 %}
-                    <span data-toggle="tooltip" data-placement="top" title="{{ user.affiliation }}">
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ user.affiliation }}">
 									{% if user.affiliation %}{{ user.affiliation | truncate(50) }}{% endif %}
 								</span>
                   {% else %}
