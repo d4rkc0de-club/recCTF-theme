@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scoreboard – recCTF</title>
+  <meta name="description"
+    content="The top three scorers, displayed as interlocking clockwork gears. A Steins;Gate-themed scoreboard for recCTF.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Clockwork backdrop: gears + clock face (decorative, same as rules) -->
+  <div class="backdrop" aria-hidden="true">
+    <svg id="gears" class="gears" preserveAspectRatio="xMidYMid slice"></svg>
+
+    <div class="clock" id="clock">
+      <svg viewBox="-200 -200 400 400" class="clock-face">
+        <circle r="196" class="ring-outer" />
+        <circle r="188" class="ring" />
+        <circle r="150" class="ring thin" />
+        <circle r="62" class="ring thin dashed" />
+        <g id="clock-ticks"></g>
+        <g id="clock-numerals"></g>
+        <g class="hand hand-hour" id="hand-hour">
+          <path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z" />
+          <circle r="12" class="hand-ring" />
+        </g>
+        <g class="hand hand-min" id="hand-min">
+          <path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z" />
+        </g>
+        <g class="hand hand-sec" id="hand-sec">
+          <line y1="34" y2="-172" />
+          <circle cy="-130" r="6" class="hand-ring" />
+        </g>
+        <circle r="6" class="hub" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Nav (same as rules page) -->
+  <nav class="top-nav">
+    <button id="toggle-mode" class="mode-btn" type="button" aria-label="Switch between dark and light mode">
+      <span id="mode-text">Dark Mode</span>
+    </button>
+    <a id="return-home" class="return-home" href="/">
+      <svg aria-hidden="true" viewBox="0 0 16 16" width="12" height="12">
+        <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+      <span>Return to Home</span>
+    </a>
+  </nav>
+
+  <main class="stage">
+    <!-- Page heading -->
+    <section class="page-title" aria-label="Scoreboard heading">
+      <p class="eyebrow">Lab Report · Top Operatives</p>
+      <h1>Scoreboard</h1>
+      <div class="divider" aria-hidden="true"><span></span><i class="mini-gear"></i><span></span></div>
+    </section>
+
+    <!-- Podium: three interlocking gears -->
+    <div class="podium-container" role="img" aria-label="Top three scorers displayed as interlocking gears">
+      <!-- Loading state -->
+      <div id="podium-loading" class="podium-loading">
+        <i class="mini-gear"></i>
+        <p>Fetching standings…</p>
+      </div>
+
+      <!-- Gears render here -->
+      <div id="podium-area"></div>
+    </div>
+
+    <!-- Screen-reader accessible standings table (hidden) -->
+    <table class="sr-standings" aria-label="Top three standings">
+      <thead>
+        <tr>
+          <th>Place</th>
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="sr-table-body">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+
+    <!-- Visible standings board -->
+    <div class="standings-board" aria-hidden="true">
+      <div class="board-inner">
+        <ul class="standings-list" id="standings-list">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer motto -->
+    <footer class="page-motto">
+      <p class="motto">El Psy Kongroo.</p>
+      <p class="sig">— Future Gadget Lab · d4rkc0de</p>
+    </footer>
+  </main>
+
+  <script src="fluid.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,608 @@
+/* =====================================================================
+   Scoreboard Gears — Steins;Gate Clockwork Podium
+   Mirrors the rules page's design tokens, nav, and stage layout.
+   ===================================================================== */
+
+:root {
+  --ink: #1c1c1e;
+  --ink-soft: #3a3a3d;
+  --muted: #6e6e72;
+  --line: rgba(20, 20, 22, 0.20);
+  --line-faint: rgba(20, 20, 22, 0.10);
+
+  --paper-1: #efeeea;
+  --paper-2: #e2e1dc;
+  --paper-3: #cfcdc7;
+  --paper-ink: #1f1f21;
+  --paper-muted: #5d5d61;
+
+  --steel-1: #2a2a2d;
+  --steel-2: #6f6f74;
+  --steel-3: #d9d9dc;
+  --steel-4: #f4f4f5;
+
+  --tube-bg: #141416;
+  --tube-glow: #f2f2f2;
+  --tube-ghost: rgba(255, 255, 255, 0.06);
+
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "Share Tech Mono", ui-monospace, monospace;
+  --font-sans: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* gear accent colours */
+  --gold: #c5a44e;
+  --gold-light: #e8d48b;
+  --gold-dark: #8b7230;
+  --silver: #a8a8b0;
+  --silver-light: #d0d0d6;
+  --silver-dark: #6e6e76;
+  --bronze: #a67c52;
+  --bronze-light: #ccaa7e;
+  --bronze-dark: #6e5038;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { background: #c8c8c8; height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: color .4s ease;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   Backdrop — gears + clock  (same as rules)
+   ===================================================================== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gears {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: fade 2s ease both;
+}
+
+.gears .gear {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin var(--dur, 60s) linear infinite;
+  animation-direction: var(--dir, normal);
+}
+.gears .gear .hub,
+.gears .gear .spoke { stroke: var(--line-faint); }
+
+.gears .annot {
+  fill: var(--muted);
+  font: 9px var(--font-mono);
+  letter-spacing: .12em;
+  opacity: .55;
+}
+.gears .annot-line {
+  stroke: var(--line-faint);
+  stroke-dasharray: 3 4;
+  fill: none;
+}
+
+.clock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vmin, 880px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: .9;
+  animation: rise 1.6s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.clock-face { width: 100%; height: 100%; overflow: visible; }
+.clock-face .ring-outer { fill: none; stroke: var(--line); stroke-width: 2.4; }
+.clock-face .ring { fill: none; stroke: var(--line); stroke-width: .9; }
+.clock-face .ring.thin { stroke: var(--line-faint); }
+.clock-face .ring.dashed { stroke-dasharray: 2 5; }
+.clock-face .tick { stroke: var(--line); stroke-width: .8; }
+.clock-face .tick.major { stroke-width: 2; }
+.clock-face .numeral {
+  fill: var(--line);
+  font: 600 20px var(--font-serif);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.clock-face .hand {
+  transition: transform .35s cubic-bezier(.4, 2.2, .5, 1);
+}
+.clock-face .hand path { fill: rgba(20, 20, 22, .16); stroke: var(--line); stroke-width: .8; }
+.clock-face .hand-sec line { stroke: rgba(20, 20, 22, .32); stroke-width: 1.2; }
+.clock-face .hand-ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.clock-face .hub { fill: var(--ink-soft); opacity: .4; }
+
+/* =====================================================================
+   Top nav (exact copy from rules)
+   ===================================================================== */
+.top-nav {
+  position: fixed;
+  top: clamp(14px, 3vh, 24px);
+  right: clamp(14px, 2.5vw, 28px);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: .65em;
+  animation: fade 1s .9s ease both;
+}
+
+.mode-btn,
+.return-home {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  padding: .55em .95em;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  font-family: inherit;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .25s ease, border-color .25s ease, background-color .25s ease;
+}
+.return-home svg { transition: transform .25s ease; }
+.mode-btn:hover,
+.return-home:hover {
+  color: var(--ink);
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+}
+.return-home:hover svg { transform: translateX(-3px); }
+.mode-btn:focus-visible,
+.return-home:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  color: var(--ink);
+}
+
+/* =====================================================================
+   Stage (same centering layout as rules)
+   ===================================================================== */
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3vh, 28px);
+  padding: clamp(56px, 9vh, 80px) 16px clamp(16px, 4vh, 36px);
+}
+
+/* =====================================================================
+   Page title
+   ===================================================================== */
+.page-title {
+  text-align: center;
+  animation: rise 1.2s .2s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.page-title .eyebrow {
+  margin: 0 0 .4rem;
+  font: .68rem var(--font-mono);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.page-title h1 {
+  margin: 0;
+  font: 700 clamp(1.5rem, 4vw, 2.4rem) / 1.1 var(--font-serif);
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+
+.page-title .divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: .8rem auto 0;
+  max-width: 300px;
+  color: var(--muted);
+}
+.page-title .divider span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+}
+.mini-gear { display: inline-block; }
+.mini-gear svg { width: 100%; height: 100%; display: block; }
+.mini-gear path { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.mini-gear circle { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.page-title .divider .mini-gear { width: 20px; height: 20px; animation: spin 12s linear infinite; }
+
+/* =====================================================================
+   Podium — Three interlocking gears
+   ===================================================================== */
+.podium-container {
+  position: relative;
+  animation: rise 1.4s .4s cubic-bezier(.2, .7, .2, 1) both;
+  /* gear sizes are controlled by JS via custom properties */
+}
+
+.podium-svg {
+  display: block;
+  overflow: visible;
+  filter:
+    drop-shadow(0 4px 16px rgba(0,0,0,.18))
+    drop-shadow(0 1px 3px rgba(0,0,0,.12));
+}
+
+/* ---- Gear body ---- */
+.podium-gear-body {
+  stroke-width: 1.5;
+  transition: filter .3s ease;
+}
+
+/* metallic gradients are defined inline in the SVG defs */
+
+/* ---- Tick ring (roman-numeral decorative ring inside the gear) ---- */
+.gear-tick-ring {
+  fill: none;
+  stroke-width: 0.8;
+  opacity: .5;
+}
+
+.gear-tick {
+  stroke-width: 0.6;
+  opacity: .4;
+}
+.gear-tick.major {
+  stroke-width: 1.2;
+  opacity: .6;
+}
+
+.gear-numeral {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  opacity: .35;
+}
+
+/* ---- Engraved concentric ring details ---- */
+.gear-ring-detail {
+  fill: none;
+  stroke-width: 0.5;
+  opacity: .2;
+}
+
+/* ---- Hub ---- */
+.gear-hub-outer {
+  stroke-width: 1.5;
+}
+.gear-hub-inner {
+  stroke-width: 1;
+}
+.gear-spoke-line {
+  stroke-width: 0.8;
+  opacity: .3;
+}
+
+/* ---- Text overlay (counter-rotated to stay upright) ---- */
+.gear-label {
+  pointer-events: none;
+}
+
+.gear-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+.gear-score {
+  font-family: var(--font-mono);
+  font-weight: 700; /* Increased font-weight slightly for visibility */
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  opacity: .9;
+}
+
+.gear-place {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  opacity: .8;
+}
+
+/* =====================================================================
+   Screen-reader-only standings table
+   ===================================================================== */
+.sr-standings {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   Subtitle / Footer motto
+   ===================================================================== */
+.page-motto {
+  text-align: center;
+  animation: fade 1s 1.2s ease both;
+}
+
+.page-motto .motto {
+  margin: 0;
+  font: italic 500 1.2rem var(--font-serif);
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+.page-motto .sig {
+  margin: .3rem 0 0;
+  font: .65rem var(--font-mono);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: .6;
+}
+
+/* =====================================================================
+   Loading state
+   ===================================================================== */
+.podium-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.podium-loading .mini-gear {
+  width: 40px;
+  height: 40px;
+  color: var(--muted);
+  animation: spin 4s linear infinite;
+}
+
+.podium-loading p {
+  margin: 0;
+  font: .72rem var(--font-mono);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* =====================================================================
+   Dark mode
+   ===================================================================== */
+html:has(body.theme-dark) { background: #08080a; }
+
+body.theme-dark {
+  --ink: #ededed;
+  --ink-soft: #cfcfd2;
+  --muted: #8a8a8f;
+  --line: rgba(235, 235, 240, 0.16);
+  --line-faint: rgba(235, 235, 240, 0.08);
+
+  --paper-1: #2a2a2d;
+  --paper-2: #1f1f22;
+  --paper-ink: #ececee;
+  --paper-muted: #9a9a9f;
+
+  --gold: #d4b45a;
+  --gold-light: #f0e09a;
+  --gold-dark: #9a8040;
+  --silver: #b8b8c0;
+  --silver-light: #e0e0e6;
+  --silver-dark: #808088;
+  --bronze: #b88c60;
+  --bronze-light: #dcba90;
+  --bronze-dark: #806040;
+}
+
+body.theme-dark .clock-face .hand path { fill: rgba(235,235,240,.10); }
+body.theme-dark .clock-face .hand-sec line { stroke: rgba(235,235,240,.3); }
+
+body.theme-dark .mode-btn,
+body.theme-dark .return-home {
+  color: #888;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(20, 20, 22, 0.5);
+}
+body.theme-dark .mode-btn:hover,
+body.theme-dark .return-home:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(30, 30, 35, 0.8);
+}
+
+/* =====================================================================
+   Motion & Keyframes
+   ===================================================================== */
+@keyframes spin { to { rotate: 360deg; } }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px) scale(.985); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .45; }
+}
+
+@keyframes gear-spin-cw {
+  to { transform: rotate(360deg); }
+}
+@keyframes gear-spin-ccw {
+  to { transform: rotate(-360deg); }
+}
+
+/* =====================================================================
+   Responsive — scale gears on small viewports
+   ===================================================================== */
+@media (max-width: 600px) {
+  .podium-container {
+    transform: scale(0.7);
+    transform-origin: center center;
+  }
+}
+
+@media (max-width: 420px) {
+  .podium-container {
+    transform: scale(0.55);
+    transform-origin: center center;
+  }
+}
+
+/* =====================================================================
+   Standings Board
+   ===================================================================== */
+.standings-board {
+  width: min(600px, calc(100vw - 32px));
+  margin: 1rem auto 3rem;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.04), transparent 8px, transparent calc(100% - 8px), rgba(0,0,0,.04)),
+    linear-gradient(90deg, rgba(0,0,0,.04), transparent 8px, transparent calc(100% - 8px), rgba(0,0,0,.04)),
+    var(--paper-1);
+  border: 1px solid var(--line-faint);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  animation: rise 1.4s .6s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+body.theme-dark .standings-board {
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  border-color: rgba(255,255,255,.05);
+}
+
+.board-inner {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.3) transparent;
+}
+body.theme-dark .board-inner {
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+
+.standings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+
+.standings-list li {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: center;
+  column-gap: 1rem;
+  padding-bottom: .8rem;
+  border-bottom: 1px dashed var(--line-faint);
+  color: var(--paper-ink);
+}
+.standings-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.standing-rank {
+  width: 2.6rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  box-shadow: 0 0 0 3px var(--paper-1), 0 0 0 4px var(--line-faint);
+  font: 700 .95rem var(--font-serif);
+}
+
+.standing-name {
+  font: 600 1.1rem / 1.25 var(--font-serif);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.standing-score {
+  font: .9rem var(--font-mono);
+  color: var(--paper-muted);
+}
+
+@media (max-height: 640px) {
+  .podium-container {
+    transform: scale(0.65);
+    transform-origin: center center;
+  }
+}
+
+/* =====================================================================
+   Reduced motion
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .gear-rotating {
+    animation: none !important;
+  }
+}
