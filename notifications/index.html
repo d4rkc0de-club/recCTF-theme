@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D-Mails | recCTF</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    // Force dark mode for the fluid background
+    window.FLUID_CONFIG = {
+      mode: 'dark',
+      splatRadius: 0.022,
+      splatForce: 0.45,
+      dyeAmount: 0.14,
+      densityGain: 1.15,
+      bloomIntensity: 0.10,
+      dissipation: 0.94,
+      velocityDissipation: 0.94,
+      vignette: 0.06
+    };
+  </script>
+  <script src="fluid.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body class="theme-dark">
+  <div class="backdrop" aria-hidden="true">
+    <svg id="gears" class="gears" preserveAspectRatio="xMidYMid slice"></svg>
+
+    <div class="clock" id="clock">
+      <svg viewBox="-200 -200 400 400" class="clock-face">
+        <circle r="196" class="ring-outer" />
+        <circle r="188" class="ring" />
+        <circle r="150" class="ring thin" />
+        <circle r="62" class="ring thin dashed" />
+        <g id="clock-ticks"></g>
+        <g id="clock-numerals"></g>
+        <g class="hand hand-hour" id="hand-hour">
+          <path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z" />
+          <circle r="12" class="hand-ring" />
+        </g>
+        <g class="hand hand-min" id="hand-min">
+          <path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z" />
+        </g>
+        <g class="hand hand-sec" id="hand-sec">
+          <line y1="34" y2="-172" />
+          <circle cy="-130" r="6" class="hand-ring" />
+        </g>
+        <circle r="6" class="hub" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Shared Steins;Gate Mechanical SVG Assets -->
+  <svg width="0" height="0" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <!-- Standard 10-tooth mechanical gear -->
+      <g id="gear-10t">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" d="M -2.5,-8.5 L -2,-10.5 L 2,-10.5 L 2.5,-8.5 L 5,-7.5 L 7,-8.5 L 8.5,-7 L 7.5,-5 L 8.5,-2.5 L 10.5,-2 L 10.5,2 L 8.5,2.5 L 7.5,5 L 8.5,7 L 7,8.5 L 5,7.5 L 2.5,8.5 L 2,10.5 L -2,10.5 L -2.5,8.5 L -5,7.5 L -7,8.5 L -8.5,7 L -7.5,5 L -8.5,2.5 L -10.5,2 L -10.5,-2 L -8.5,-2.5 L -7.5,-5 L -8.5,-7 L -7,-8.5 L -5,-7.5 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" cx="0" cy="0" r="3" />
+      </g>
+    </defs>
+  </svg>
+
+  <header class="header-band">
+    <div class="header-title-wrap">
+      <h1 class="page-title">
+        <i class="mini-gear">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            <circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </i>
+        D-Mails
+        <i class="mini-gear" style="animation-direction: reverse;">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            <circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </i>
+      </h1>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="action-bar">
+      <button type="button" class="btn-ghost" id="mark-all-read">Mark all as read</button>
+      <div class="notif-stats">
+        <strong id="unread-count">0</strong> unread messages
+      </div>
+    </div>
+
+    <div class="notif-list" id="notif-list">
+      <!-- Notifications will be injected here by app.js -->
+    </div>
+  </main>
+</body>
+</html>
