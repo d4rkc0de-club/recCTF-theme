@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings – recCTF</title>
+  <meta name="description" content="Participant settings and access tokens.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.FLUID_CONFIG = {
+      mode: 'dark',
+      splatRadius: 0.022,
+      splatForce: 0.45,
+      dyeAmount: 0.14,
+      densityGain: 1.15,
+      bloomIntensity: 0.10,
+      dissipation: 0.94,
+      velocityDissipation: 0.94,
+      vignette: 0.06
+    };
+  </script>
+  <script src="fluid.js" defer></script>
+</head>
+<body class="theme-dark">
+  <!-- Clockwork backdrop: gears + clock face -->
+  <div class="backdrop" aria-hidden="true">
+    <svg id="gears" class="gears" preserveAspectRatio="xMidYMid slice"></svg>
+    <div class="clock" id="clock">
+      <svg viewBox="-200 -200 400 400" class="clock-face">
+        <circle r="196" class="ring-outer" />
+        <circle r="188" class="ring" />
+        <circle r="150" class="ring thin" />
+        <circle r="62" class="ring thin dashed" />
+        <g id="clock-ticks"></g>
+        <g id="clock-numerals"></g>
+        <g class="hand hand-hour" id="hand-hour">
+          <path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z" />
+          <circle r="12" class="hand-ring" />
+        </g>
+        <g class="hand hand-min" id="hand-min">
+          <path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z" />
+        </g>
+        <g class="hand hand-sec" id="hand-sec">
+          <line y1="34" y2="-172" />
+          <circle cy="-130" r="6" class="hand-ring" />
+        </g>
+        <circle r="6" class="hub" />
+      </svg>
+    </div>
+  </div>
+
+  <div class="shift-flash" id="shift-flash" aria-hidden="true"></div>
+
+  <!-- Shared Steins;Gate Mechanical SVG Assets -->
+  <svg width="0" height="0" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <g id="gear-10t">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" d="M -2.5,-8.5 L -2,-10.5 L 2,-10.5 L 2.5,-8.5 L 5,-7.5 L 7,-8.5 L 8.5,-7 L 7.5,-5 L 8.5,-2.5 L 10.5,-2 L 10.5,2 L 8.5,2.5 L 7.5,5 L 8.5,7 L 7,8.5 L 5,7.5 L 2.5,8.5 L 2,10.5 L -2,10.5 L -2.5,8.5 L -5,7.5 L -7,8.5 L -8.5,7 L -7.5,5 L -8.5,2.5 L -10.5,2 L -10.5,-2 L -8.5,-2.5 L -7.5,-5 L -8.5,-7 L -7,-8.5 L -5,-7.5 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" cx="0" cy="0" r="3" />
+      </g>
+      <g id="icon-eye">
+        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="8" cy="8" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+      </g>
+      <g id="icon-eye-slash">
+        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="8" cy="8" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <line x1="2" y1="2" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </g>
+      <g id="icon-lock">
+        <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <path d="M5 7V4a3 3 0 0 1 6 0v3" fill="none" stroke="currentColor" stroke-width="1.5" />
+      </g>
+    </defs>
+  </svg>
+
+  <nav class="top-nav" aria-label="Main Navigation">
+    <a class="nav-pill" href="/challenges"><span>Challenges</span></a>
+    <a class="nav-pill" href="/scoreboard"><span>Scoreboard</span></a>
+    <a class="nav-pill" href="/team"><span>Team</span></a>
+    <div class="user-menu-wrapper" id="user-menu-wrapper">
+      <button class="nav-pill active" type="button" aria-expanded="false" id="user-btn">
+        <span>RintaroOkabe</span>
+      </button>
+      <div class="user-dropdown" id="user-dropdown" hidden>
+        <a href="/profile">Profile</a>
+        <a href="/settings" class="active">Settings</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+    <button id="toggle-mode" class="mode-btn" type="button" aria-label="Switch between dark and light mode">
+      <span id="mode-text">Dark Mode</span>
+    </button>
+  </nav>
+
+  <main class="stage">
+    <div class="page-header">
+      <h1 class="page-title">Settings</h1>
+      <div class="divider" aria-hidden="true"><span></span><i class="mini-gear"><svg viewBox="-12 -12 24 24"><use href="#gear-10t"></use></svg></i><span></span></div>
+    </div>
+
+    <!-- Layout container -->
+    <div class="layout-container">
+      
+      <!-- Tabs -->
+      <aside class="tabs-sidebar">
+        <div class="tabs-nav" role="tablist">
+          <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="tab-profile" id="btn-profile">Profile</button>
+          <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-tokens" id="btn-tokens">Access Tokens</button>
+        </div>
+      </aside>
+
+      <!-- Tab Content -->
+      <div class="tabs-content">
+        <!-- Toast for success/error -->
+        <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+        <!-- PROFILE TAB -->
+        <div role="tabpanel" id="tab-profile" aria-labelledby="btn-profile">
+          <form class="settings-form" id="profile-form">
+            
+            <div class="card">
+              <h2 class="card-title">Basic Information</h2>
+              <div class="card-body">
+                
+                <div class="form-group disabled-group">
+                  <label for="username">User Name <svg class="icon-lock" viewBox="0 0 16 16"><use href="#icon-lock"></use></svg></label>
+                  <input type="text" id="username" class="form-control" value="RintaroOkabe" disabled>
+                  <div class="form-helper">Name changes are disabled for this event.</div>
+                  <div class="form-error">This username is already taken.</div>
+                </div>
+
+                <div class="form-group error">
+                  <div class="label-row">
+                    <label for="email">Email</label>
+                    <span class="status-badge unverified">Unverified</span>
+                  </div>
+                  <input type="email" id="email" class="form-control" value="okabe@futuregadgetlab.org">
+                  <div class="form-helper"><a href="#" class="resend-link">Resend confirmation email</a></div>
+                  <div class="form-error">Please enter a valid email address.</div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">Security</h2>
+              <div class="card-body">
+                
+                <div class="form-group error">
+                  <label for="current-password">Current Password</label>
+                  <div class="input-wrapper">
+                    <input type="password" id="current-password" class="form-control" value="wrongpassword">
+                    <button type="button" class="pwd-toggle" aria-label="Show password"><svg viewBox="0 0 16 16"><use href="#icon-eye"></use></svg></button>
+                  </div>
+                  <div class="form-helper">Required only if changing email or password.</div>
+                  <div class="form-error">Incorrect current password.</div>
+                </div>
+
+                <div class="form-group error">
+                  <label for="new-password">New Password</label>
+                  <div class="input-wrapper">
+                    <input type="password" id="new-password" class="form-control" value="qwerty">
+                    <button type="button" class="pwd-toggle" aria-label="Show password"><svg viewBox="0 0 16 16"><use href="#icon-eye"></use></svg></button>
+                  </div>
+                  <div class="strength-meter"><div class="strength-fill weak"></div></div>
+                  <div class="form-helper">Choose a strong, unique password.</div>
+                  <div class="form-error">Password is too weak.</div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">Optional Details</h2>
+              <div class="card-body">
+                
+                <div class="form-group">
+                  <label for="affiliation">Affiliation</label>
+                  <input type="text" id="affiliation" class="form-control" value="Future Gadget Laboratory">
+                  <div class="form-helper">Your school, university, or organization.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="website">Website</label>
+                  <input type="url" id="website" class="form-control" value="http://futuregadgetlab.org">
+                  <div class="form-helper">Personal website or blog.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="country">Country</label>
+                  <select id="country" class="form-control">
+                    <option value="">Select a country...</option>
+                    <option value="JP" selected>Japan (JP)</option>
+                    <option value="US">United States (US)</option>
+                  </select>
+                  <div class="form-helper">Your country of residence.</div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">Custom Fields</h2>
+              <div class="card-body">
+                
+                <div class="form-group">
+                  <label for="custom-text">Discord Username <span class="required">*</span></label>
+                  <input type="text" id="custom-text" class="form-control" value="HououinKyouma#0001" required>
+                  <div class="form-helper">Used for support in our Discord server.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="custom-readonly">Participant ID</label>
+                  <input type="text" id="custom-readonly" class="form-control" value="FG-001" readonly>
+                  <div class="form-helper">Assigned by organizers. Cannot be changed.</div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                  <input type="checkbox" id="custom-checkbox" checked>
+                  <div class="checkbox-content">
+                    <label for="custom-checkbox">Subscribe to Newsletter</label>
+                    <div class="form-helper">Receive updates about future events.</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="btn-update">Update Settings</button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- TOKENS TAB -->
+        <div role="tabpanel" id="tab-tokens" aria-labelledby="btn-tokens" hidden>
+          <div class="card">
+            <h2 class="card-title">Generate Access Token</h2>
+            <div class="card-body">
+              <p class="card-desc">Access tokens allow you to use the recCTF API as your user.</p>
+              <form class="tokens-form">
+                <div class="form-group">
+                  <label for="token-expiration">Expiration</label>
+                  <input type="date" id="token-expiration" class="form-control">
+                  <div class="form-helper">Leave blank for a token that never expires.</div>
+                </div>
+                <div class="form-group">
+                  <label for="token-desc">Description</label>
+                  <textarea id="token-desc" class="form-control" rows="2" placeholder="e.g. CLI tool script"></textarea>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-primary" id="btn-generate">Generate</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Active Tokens</h2>
+            <div class="card-body p-0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Created</th>
+                    <th>Expiration</th>
+                    <th>Description</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2024-05-12</td>
+                    <td>Never</td>
+                    <td>CLI Auto-submit script</td>
+                    <td class="text-right"><button type="button" class="btn-danger-sm">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td>2024-08-01</td>
+                    <td>2024-09-01</td>
+                    <td>Stat tracker</td>
+                    <td class="text-right"><button type="button" class="btn-danger-sm">Delete</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /* ------------------------------------------------------------------
+     * Steins;Gate Clockwork Background Generator
+     * ---------------------------------------------------------------- */
+    (() => {
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const TAU = Math.PI * 2;
+      const el = (tag, attrs = {}, parent) => {
+        const node = document.createElementNS(SVG_NS, tag);
+        for (const k in attrs) node.setAttribute(k, attrs[k]);
+        if (parent) parent.appendChild(node);
+        return node;
+      };
+
+      function gearPath(teeth, r, m) {
+        const ro = r + m;
+        const rr = r - 1.25 * m;
+        const p = TAU / teeth;
+        const pt = (rad, a) => \`\${(rad * Math.cos(a)).toFixed(2)} \${(rad * Math.sin(a)).toFixed(2)}\`;
+        let d = '';
+        for (let i = 0; i < teeth; i++) {
+          const b = i * p;
+          d += (i ? 'L' : 'M') + pt(rr, b);
+          d += 'L' + pt(ro, b + p * 0.2);
+          d += 'L' + pt(ro, b + p * 0.45);
+          d += 'L' + pt(rr, b + p * 0.65);
+        }
+        return d + 'Z';
+      }
+
+      const gearsSvg = document.getElementById('gears');
+      const SPEED = 1.7;
+
+      function addGear(parent, { x, y, teeth, m, rot, dir }) {
+        const r = (m * teeth) / 2;
+        const outer = el('g', { transform: \`translate(\${x.toFixed(1)} \${y.toFixed(1)}) rotate(\${rot.toFixed(3)})\` }, parent);
+        const g = el('g', { class: 'gear' }, outer);
+        g.style.setProperty('--dur', \`\${(teeth * SPEED).toFixed(1)}s\`);
+        g.style.setProperty('--dir', dir > 0 ? 'normal' : 'reverse');
+        el('path', { d: gearPath(teeth, r, m) }, g);
+        const inner = r - 1.25 * m - m * 1.6;
+        if (inner > 14) {
+          el('circle', { r: inner.toFixed(1) }, g);
+          const hub = Math.max(6, r * 0.22);
+          el('circle', { r: hub.toFixed(1), class: 'hub' }, g);
+          el('circle', { r: (hub * 0.45).toFixed(1) }, g);
+          const spokes = teeth > 30 ? 6 : teeth > 18 ? 5 : 4;
+          for (let i = 0; i < spokes; i++) {
+            const a = (i / spokes) * TAU;
+            el('line', {
+              x1: (hub * Math.cos(a)).toFixed(1), y1: (hub * Math.sin(a)).toFixed(1),
+              x2: (inner * Math.cos(a)).toFixed(1), y2: (inner * Math.sin(a)).toFixed(1),
+              class: 'spoke',
+            }, g);
+          }
+        } else {
+          el('circle', { r: Math.max(3, r * 0.25).toFixed(1) }, g);
+        }
+        return { x, y, teeth, m, r, rot, dir };
+      }
+
+      function meshWith(parent, A, teeth, deg) {
+        const th = (deg * Math.PI) / 180;
+        const rB = (A.m * teeth) / 2;
+        const dist = A.r + rB;
+        const pA = TAU / A.teeth;
+        const pB = TAU / teeth;
+        const a = (A.rot * Math.PI) / 180;
+        const phiA = (((th - a) / pA) % 1 + 1) % 1;
+        const b = th + Math.PI - pB * (0.15 - phiA);
+        return addGear(parent, {
+          x: A.x + dist * Math.cos(th),
+          y: A.y + dist * Math.sin(th),
+          teeth, m: A.m, rot: (b * 180) / Math.PI, dir: -A.dir,
+        });
+      }
+
+      function annotate(parent, G, text, deg, len = 60) {
+        const th = (deg * Math.PI) / 180;
+        const x1 = G.x + (G.r + G.m * 2) * Math.cos(th);
+        const y1 = G.y + (G.r + G.m * 2) * Math.sin(th);
+        const x2 = x1 + len * Math.cos(th);
+        const y2 = y1 + len * Math.sin(th);
+        const right = Math.cos(th) >= 0;
+        el('path', { d: \`M\${x1} \${y1} L\${x2} \${y2} l\${right ? 40 : -40} 0\`, class: 'annot-line' }, parent);
+        const t = el('text', { x: x2 + (right ? 44 : -44), y: y2 + 3, class: 'annot', 'text-anchor': right ? 'start' : 'end' }, parent);
+        t.textContent = text;
+      }
+
+      function buildGears() {
+        const W = innerWidth;
+        const H = innerHeight;
+        if (!gearsSvg) return;
+        gearsSvg.setAttribute('viewBox', \`0 0 \${W} \${H}\`);
+        gearsSvg.replaceChildren();
+        const s = Math.min(1.25, Math.max(0.55, Math.min(W, H) / 860));
+        const root = el('g', {}, gearsSvg);
+
+        const g1 = addGear(root, { x: W * 0.04, y: H * 0.14, teeth: 40, m: 6 * s, rot: 0, dir: 1 });
+        const g2 = meshWith(root, g1, 18, 38);
+        const g3 = meshWith(root, g2, 28, 95);
+        meshWith(root, g3, 12, 25);
+        annotate(root, g2, 'T18 · ω 2.22', -20, 50 * s);
+
+        const h1 = addGear(root, { x: W * 0.97, y: H * 0.9, teeth: 48, m: 6 * s, rot: 3, dir: -1 });
+        const h2 = meshWith(root, h1, 16, 205);
+        const h3 = meshWith(root, h2, 30, 255);
+        meshWith(root, h3, 14, 195);
+        annotate(root, h3, 'IBN 5100', 200, 46 * s);
+
+        const k1 = addGear(root, { x: W * 0.95, y: H * 0.08, teeth: 32, m: 4.5 * s, rot: 0, dir: 1 });
+        const k2 = meshWith(root, k1, 14, 150);
+        annotate(root, k2, 'Ø ' + Math.round(k2.r * 2) + ' · β', 170, 40 * s);
+
+        const l1 = addGear(root, { x: W * 0.06, y: H * 0.94, teeth: 26, m: 5 * s, rot: 0, dir: -1 });
+        const l2 = meshWith(root, l1, 12, -40);
+        annotate(root, l2, 'WL 1.048596', -30, 40 * s);
+      }
+
+      buildGears();
+      let resizeTimer;
+      addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(buildGears, 150);
+      });
+
+      const ticks = document.getElementById('clock-ticks');
+      const numerals = document.getElementById('clock-numerals');
+      const ROMAN = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+      
+      if (ticks) {
+        for (let i = 0; i < 60; i++) {
+          const a = (i / 60) * TAU - Math.PI / 2;
+          const major = i % 5 === 0;
+          const r1 = 186;
+          const r2 = major ? 172 : 180;
+          el('line', {
+            x1: (r1 * Math.cos(a)).toFixed(2), y1: (r1 * Math.sin(a)).toFixed(2),
+            x2: (r2 * Math.cos(a)).toFixed(2), y2: (r2 * Math.sin(a)).toFixed(2),
+            class: major ? 'tick major' : 'tick',
+          }, ticks);
+        }
+      }
+      if (numerals) {
+        ROMAN.forEach((n, i) => {
+          const a = (i / 12) * TAU - Math.PI / 2;
+          const t = el('text', { x: (160 * Math.cos(a)).toFixed(2), y: (160 * Math.sin(a)).toFixed(2), class: 'numeral' }, numerals);
+          t.textContent = n;
+        });
+      }
+
+      const hHour = document.getElementById('hand-hour');
+      const hMin = document.getElementById('hand-min');
+      const hSec = document.getElementById('hand-sec');
+      
+      function setHands() {
+        if (!hSec) return;
+        const d = new Date();
+        const h = d.getHours();
+        const m = d.getMinutes();
+        const sec = d.getSeconds();
+        const secDeg = (h * 3600 + m * 60 + sec) * 6;
+        const minDeg = (h * 60 + m + sec / 60) * 6;
+        const hourDeg = (h * 60 + m) * 0.5;
+        hSec.style.transform = \`rotate(\${secDeg}deg)\`;
+        hMin.style.transform = \`rotate(\${minDeg}deg)\`;
+        hHour.style.transform = \`rotate(\${hourDeg}deg)\`;
+      }
+      setHands();
+      setInterval(setHands, 1000);
+    })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Theme toggle
+      const btn = document.getElementById('toggle-mode');
+      const label = document.getElementById('mode-text');
+      let currentMode = 'dark';
+      btn?.addEventListener('click', () => {
+        currentMode = currentMode === 'light' ? 'dark' : 'light';
+        if (window.FluidBackground) {
+          window.FluidBackground.setMode(currentMode);
+        }
+        document.body.classList.toggle('theme-dark', currentMode === 'dark');
+        label.textContent = currentMode === 'light' ? 'Dark Mode' : 'Light Mode';
+      });
+
+      // User menu
+      const userBtn = document.getElementById('user-btn');
+      const userDropdown = document.getElementById('user-dropdown');
+      userBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const expanded = userBtn.getAttribute('aria-expanded') === 'true';
+        userBtn.setAttribute('aria-expanded', !expanded);
+        userDropdown.hidden = expanded;
+      });
+      document.addEventListener('click', () => {
+        if (userBtn && userBtn.getAttribute('aria-expanded') === 'true') {
+          userBtn.setAttribute('aria-expanded', 'false');
+          userDropdown.hidden = true;
+        }
+      });
+
+      // Tabs
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabPanels = document.querySelectorAll('[role="tabpanel"]');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          tabPanels.forEach(p => p.hidden = true);
+          
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          const panel = document.getElementById(btn.getAttribute('aria-controls'));
+          panel.hidden = false;
+        });
+      });
+
+      // Password toggle
+      document.querySelectorAll('.pwd-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = btn.previousElementSibling;
+          const svg = btn.querySelector('use');
+          if (input.type === 'password') {
+            input.type = 'text';
+            svg.setAttribute('href', '#icon-eye-slash');
+          } else {
+            input.type = 'password';
+            svg.setAttribute('href', '#icon-eye');
+          }
+        });
+      });
+
+      // Demo toast on form submit
+      const profileForm = document.getElementById('profile-form');
+      const toastContainer = document.getElementById('toast-container');
+      profileForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Remove error states for demo purposes to show success toast
+        document.querySelectorAll('.form-group.error').forEach(g => g.classList.remove('error'));
+
+        toastContainer.innerHTML = `
+          <div class="toast success">
+            <svg viewBox="0 0 16 16" width="16" height="16"><path d="M14 4l-8 8-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Your profile has been updated successfully.</span>
+          </div>
+        `;
+        setTimeout(() => { toastContainer.innerHTML = ''; }, 4000);
+      });
+    });
+  </script>
+</body>
+</html>
