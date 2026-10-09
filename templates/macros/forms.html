@@ -1,99 +1,302 @@
 {% macro render_extra_fields(fields, show_labels=True, show_optionals=True, show_descriptions=True) -%}
-  {% for field in fields %}
-    {% if field.field_type == "text" %}
 
-      <div class="mb-3">
-        {% if show_labels %}
-          <b>
-            {{ field.label(class="form-label") }}
-            {% if field.flags.required %}
-              <span class="text-danger">*</span>
-            {% endif %}
-          </b>
-        {% endif %}
+<style>
+  /* ================================================================
+     Auth Extra Fields
+     No Bootstrap dependencies
+     ================================================================ */
 
-        {% if show_optionals %}
-          {% if field.flags.required is false %}
-            <small class="ms-1 text-muted">
-              {% trans %}(Optional){% endtrans %}
-            </small>
-          {% endif %}
-        {% endif %}
+  .auth-extra-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
 
-        {{ field(class="form-control") }}
+  .auth-extra-label {
+    display: block;
+    font: 500 0.78rem var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-        {% if show_descriptions %}
-          {% if field.description %}
-            <small class="form-text text-muted">
-              {{ field.description }}
-            </small>
-          {% endif %}
-        {% endif %}
-      </div>
+  .auth-extra-required {
+    color: #c0392b;
+    margin-left: 0.15rem;
+  }
 
-    {% elif field.field_type == "boolean" %}
+  .auth-extra-optional {
+    margin-left: 0.4rem;
+    font: 0.75rem var(--font-mono);
+    color: var(--muted);
+    opacity: 0.7;
+    letter-spacing: normal;
+    text-transform: none;
+  }
 
-      <div>
-        <b>
-          {{ field.label(class="form-label") }}
+  .auth-extra-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--ink-soft);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .auth-extra-input:focus {
+    outline: none;
+    border-color: rgba(235, 235, 240, 0.4);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 1px rgba(235, 235, 240, 0.05);
+  }
+
+  .auth-extra-input::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .auth-extra-description {
+    display: block;
+    margin-top: 0.05rem;
+    font: 0.75rem/1.45 var(--font-mono);
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  /* ================================================================
+     Boolean / Checkbox Field
+     ================================================================ */
+
+  .auth-extra-checkbox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.2rem;
+    padding: 0.9rem 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .auth-extra-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .auth-extra-checkbox-input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex: 0 0 auto;
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .auth-extra-checkbox-input:hover {
+    border-color: rgba(235, 235, 240, 0.35);
+  }
+
+  .auth-extra-checkbox-input:checked {
+    background: var(--ink-soft);
+    border-color: var(--ink-soft);
+  }
+
+  .auth-extra-checkbox-input:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid #0a0a0c;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .auth-extra-checkbox-input:focus-visible {
+    outline: 1px solid rgba(235, 235, 240, 0.5);
+    outline-offset: 2px;
+  }
+
+  .auth-extra-checkbox-label {
+    cursor: pointer;
+    font: 500 0.78rem var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ================================================================
+     Select Field
+     ================================================================ */
+
+  .auth-extra-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 38px 10px 14px;
+    background:
+      rgba(255, 255, 255, 0.04)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2388888f' stroke-width='1.5'/%3E%3C/svg%3E")
+      no-repeat right 14px center;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--ink-soft);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .auth-extra-select:focus {
+    outline: none;
+    border-color: rgba(235, 235, 240, 0.4);
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .auth-extra-select option {
+    background: #141418;
+    color: var(--ink-soft);
+  }
+
+  /* ================================================================
+     Mobile
+     ================================================================ */
+
+  @media (max-width: 480px) {
+    .auth-extra-field {
+      margin-bottom: 1rem;
+    }
+
+    .auth-extra-checkbox {
+      padding: 0.8rem;
+    }
+
+    .auth-extra-label,
+    .auth-extra-checkbox-label {
+      font-size: 0.74rem;
+    }
+  }
+</style>
+
+
+{% for field in fields %}
+
+  {% if field.field_type == "text" %}
+
+    <div class="auth-extra-field">
+
+      {% if show_labels %}
+        <label class="auth-extra-label" for="{{ field.id }}">
+          {{ field.label.text }}
+
           {% if field.flags.required %}
-            <span class="text-danger">*</span>
-          {% endif %}
-        </b>
-
-        {% if show_optionals %}
-          {% if field.flags.required is false %}
-            <small class="ms-1 text-muted">
+            <span class="auth-extra-required">*</span>
+          {% elif show_optionals %}
+            <span class="auth-extra-optional">
               {% trans %}(Optional){% endtrans %}
-            </small>
+            </span>
           {% endif %}
-        {% endif %}
-      </div>
-
-      <div class="mb-3 border border-1 p-3">
-        <div class="form-check">
-          {{ field(class="form-check-input") }}
-          {{ field.label(class="form-check-label") }}
-        </div>
-
-        {% if show_descriptions %}
-          {% if field.description %}
-            <small class="form-text text-muted">
-              {{ field.description }}
-            </small>
-          {% endif %}
-
-        {% endif %}
-      </div>
-
-    {% elif field.field_type == "select" %}
-
-      <div>
-        <b>
-          {{ field.label(class="form-label") }}
-          {% if field.flags.required %}
-            <span class="text-danger">*</span>
-          {% endif %}
-        </b>
-
-        {% if show_optionals %}
-          {% if field.flags.required is false %}
-            <small class="ms-1 text-muted">
-              {% trans %}(Optional){% endtrans %}
-            </small>
-          {% endif %}
-        {% endif %}
-      </div>
-
-      {{ field(class="form-select") }}
-
-      {% if show_descriptions %}
-        {% if field.description %}
-          <small class="form-text text-muted">
-            {{ field.description }}
-          </small>
-        {% endif %}
+        </label>
       {% endif %}
-    {% endif %}
-  {% endfor %}
+
+      {{ field(class="auth-extra-input") }}
+
+      {% if show_descriptions and field.description %}
+        <small class="auth-extra-description">
+          {{ field.description }}
+        </small>
+      {% endif %}
+
+    </div>
+
+
+  {% elif field.field_type == "boolean" %}
+
+    <div class="auth-extra-checkbox">
+
+      <div class="auth-extra-checkbox-row">
+
+        {{ field(class="auth-extra-checkbox-input") }}
+
+        <label
+          class="auth-extra-checkbox-label"
+          for="{{ field.id }}"
+        >
+          {{ field.label.text }}
+
+          {% if field.flags.required %}
+            <span class="auth-extra-required">*</span>
+          {% elif show_optionals %}
+            <span class="auth-extra-optional">
+              {% trans %}(Optional){% endtrans %}
+            </span>
+          {% endif %}
+        </label>
+
+      </div>
+
+      {% if show_descriptions and field.description %}
+        <small class="auth-extra-description">
+          {{ field.description }}
+        </small>
+      {% endif %}
+
+    </div>
+
+
+  {% elif field.field_type == "select" %}
+
+    <div class="auth-extra-field">
+
+      {% if show_labels %}
+        <label class="auth-extra-label" for="{{ field.id }}">
+          {{ field.label.text }}
+
+          {% if field.flags.required %}
+            <span class="auth-extra-required">*</span>
+          {% elif show_optionals %}
+            <span class="auth-extra-optional">
+              {% trans %}(Optional){% endtrans %}
+            </span>
+          {% endif %}
+        </label>
+      {% endif %}
+
+      {{ field(class="auth-extra-select") }}
+
+      {% if show_descriptions and field.description %}
+        <small class="auth-extra-description">
+          {{ field.description }}
+        </small>
+      {% endif %}
+
+    </div>
+
+  {% endif %}
+
+{% endfor %}
+
 {%- endmacro %}

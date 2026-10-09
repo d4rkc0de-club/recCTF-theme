@@ -1,0 +1,101 @@
+<!-- {% extends "base.html" %}
+
+{% block content %}
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+    <defs>
+      <g id="gear-large-sb">
+        <path fill="none" stroke="currentColor" stroke-width="1.8" d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" r="20"/>
+        <circle fill="none" stroke="currentColor" stroke-width="1.8" r="8"/>
+        <line x1="0" y1="-8" x2="0" y2="-20" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="0" y1="8" x2="0" y2="20" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="-6.9" y1="-4" x2="-17.3" y2="-10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6.9" y1="4" x2="17.3" y2="10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="-6.9" y1="4" x2="-17.3" y2="10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6.9" y1="-4" x2="17.3" y2="-10" stroke="currentColor" stroke-width="1.2"/>
+      </g>
+    </defs>
+  </svg>
+
+  <header class="header-band">
+    <div class="header-title-wrap">
+      <svg class="header-gear left-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-sb" />
+      </svg>
+      <h1 class="page-title">
+        {% trans %}Scoreboard{% endtrans %}
+      </h1>
+      <svg class="header-gear right-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-sb" />
+      </svg>
+    </div>
+    <p class="header-subtitle">{% trans %}Operative Rankings{% endtrans %}</p>
+  </header>
+
+  <div class="container">
+    {% include "components/errors.html" %}
+
+    <div id="score-graph" class="align-items-center" :class="{'d-flex': show, 'd-none': !show}"
+         x-data="ScoreboardDetail" x-ref="scoregraph"
+         @bracket-change.window="activeBracket=$event.detail; update();">
+      <div class="col-md-12 text-center">
+        <svg class="loading-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+          <use href="#gear-large-sb"/>
+        </svg>
+      </div>
+    </div>
+
+    <div id="scoreboard" class="row" x-data="ScoreboardList">
+      <template x-if="brackets.length && standings.length">
+        <div class="col-md-12 py-3">
+          <nav class="nav nav-pills nav-fill">
+            <button :class="{'nav-link': true, 'active': !activeBracket}" @click="activeBracket=null">
+              {% trans %}All{% endtrans %}
+            </button>
+            <template x-for="bracket in brackets">
+              <button :class="{'nav-link': true, 'active': activeBracket == bracket.id}"
+                      x-text="bracket.name" @click="activeBracket=bracket.id"></button>
+            </template>
+          </nav>
+        </div>
+      </template>
+
+      <div class="col-md-12 standings-board" x-show="standings.length">
+        <table class="table table-striped align-middle board-inner">
+          <thead>
+            <tr>
+              <th style="width: 10px">{% trans %}Place{% endtrans %}</th>
+              <th class="text-start ps-3">{{ get_mode_as_word(capitalize=True) }}</th>
+              <th>{% trans %}Score{% endtrans %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="(standing, index) in standings.filter(i => activeBracket ? i.bracket_id==activeBracket : true)">
+              <tr>
+                <th scope="row" class="text-center" x-text="index + 1"></th>
+                <td class="text-start">
+                  <a :href="standing.account_url" x-text="standing.name"></a>
+                  <template x-if="standing.bracket_name">
+                    <span class="badge bg-secondary ms-2" x-text="standing.bracket_name"></span>
+                  </template>
+                </td>
+                <td x-text="standing.score"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-12" x-show="! standings.length">
+        <p class="text-muted text-center py-5" style="font-family:var(--font-serif);font-size:1.2rem;">
+          {% trans %}No operatives on the board yet{% endtrans %}
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ Assets.js("assets/js/scoreboard.js") }}
+{% endblock %}
+ -->

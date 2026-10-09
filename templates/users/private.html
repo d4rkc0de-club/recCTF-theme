@@ -1,223 +1,1470 @@
+
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="jumbotron">
-    <div class="container">
-      <h1>{{ user.name }}</h1>
 
-      {% if user.team_id %}
-        <h2>
-          <a href="{{ url_for('teams.public', team_id=user.team_id) }}">
-						<span class="badge bg-secondary">
-							{{ user.team.name }}
-						</span>
-          </a>
-        </h2>
-      {% endif %}
+<style>
+  /* ==========================================================================
+     PUBLIC PROFILE
+     Steins;Gate-inspired / CTFd
+     No Bootstrap dependencies
+     ========================================================================== */
 
-      <div class="pt-2">
-        {% if user.oauth_id %}
-          <a href="https://majorleaguecyber.org/u/{{ user.name }}">
-            <h3 class="d-inline-block mx-1"><span class="badge rounded-pill bg-primary">{% trans %}Official{% endtrans %}</span></h3>
-          </a>
-        {% endif %}
+  .profile-page {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1rem 4rem;
+    box-sizing: border-box;
+  }
 
-        {% if user.affiliation %}
-          <h3 class="d-inline-block mx-1">
-            <span class="badge rounded-pill bg-primary">{{ user.affiliation }}</span>
-          </h3>
-        {% endif %}
+  /* --------------------------------------------------------------------------
+     Header
+     -------------------------------------------------------------------------- */
 
-        {% if user.country %}
-          <h3 class="d-inline-block mx-1">
-            <span class="badge rounded-pill bg-primary">
-                <i class="flag-{{ user.country.lower() }}"></i>
-                {{ lookup_country_code(user.country) }}
-            </span>
-          </h3>
-        {% endif %}
+  .profile-header {
+    position: relative;
+    text-align: center;
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .profile-header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
+  }
+
+  .profile-header-gear {
+    width: 52px;
+    height: 52px;
+    color: var(--muted);
+    opacity: 0.7;
+    flex: 0 0 auto;
+  }
+
+  .profile-header-gear--left {
+    animation: profile-spin-reverse 18s linear infinite;
+  }
+
+  .profile-header-gear--right {
+    animation: profile-spin 18s linear infinite;
+  }
+
+  .profile-header-name {
+    margin: 0;
+    max-width: min(70vw, 760px);
+    overflow: hidden;
+    color: var(--ink-soft);
+    font: 700 clamp(1.65rem, 4vw, 2.35rem)/1.1 var(--font-serif);
+    letter-spacing: 0.035em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-header-subtitle {
+    margin: 0.65rem 0 0;
+    color: var(--muted);
+    font: 0.75rem var(--font-mono);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* --------------------------------------------------------------------------
+     Main layout
+     -------------------------------------------------------------------------- */
+
+  .profile-layout {
+    display: grid;
+    grid-template-columns: minmax(250px, 0.85fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .profile-sidebar,
+  .profile-main {
+    min-width: 0;
+  }
+
+  /* --------------------------------------------------------------------------
+     Panels
+     -------------------------------------------------------------------------- */
+
+  .profile-card,
+  .profile-section {
+    background: rgba(20, 20, 24, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+      0 20px 55px -25px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
+  .profile-card {
+    padding: 1.35rem;
+  }
+
+  .profile-section {
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .profile-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .profile-section-title {
+    margin: 0;
+    color: var(--ink-soft);
+    font: 700 1rem var(--font-serif);
+    letter-spacing: 0.025em;
+  }
+
+  .profile-section-label {
+    color: var(--muted);
+    font: 0.68rem var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .profile-section-body {
+    padding: 1.15rem;
+  }
+
+  /* --------------------------------------------------------------------------
+     User information
+     -------------------------------------------------------------------------- */
+
+  .profile-identity {
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .profile-identity-label {
+    margin-bottom: 0.8rem;
+    color: var(--muted);
+    font: 0.68rem var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .profile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 25px;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--muted);
+    font: 0.68rem var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  .profile-badge--official {
+    color: var(--ink-soft);
+    border-color: rgba(235, 235, 240, 0.28);
+    text-decoration: none;
+  }
+
+  .profile-badge--official:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+  }
+
+  .profile-badge--bracket {
+    border-color: rgba(119, 119, 255, 0.25);
+  }
+
+  .profile-country-flag {
+    display: inline-block;
+  }
+
+  .profile-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .profile-field {
+    margin: 0;
+    color: var(--muted);
+    font: 0.76rem/1.45 var(--font-mono);
+    word-break: break-word;
+  }
+
+  .profile-field::first-letter {
+    color: var(--ink-soft);
+  }
+
+  .profile-website {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 1rem 0;
+    color: var(--ink-soft);
+    font: 0.76rem/1.4 var(--font-mono);
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .profile-website:hover {
+    color: #fff;
+  }
+
+  .profile-website svg {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    opacity: 0.7;
+  }
+
+  /* --------------------------------------------------------------------------
+     Statistics
+     -------------------------------------------------------------------------- */
+
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .profile-stat {
+    min-width: 0;
+    padding: 0.9rem 0.55rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .profile-stat + .profile-stat {
+    border-left: 1px solid var(--line);
+  }
+
+  .profile-stat__val {
+    display: block;
+    color: var(--ink-soft);
+    font: 700 1.15rem var(--font-mono);
+  }
+
+  .profile-stat__label {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--muted);
+    font: 0.62rem var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* --------------------------------------------------------------------------
+     Awards
+     -------------------------------------------------------------------------- */
+
+  .awards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .award-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: 0.7rem;
+    padding: 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.018);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .award-card:hover {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(235, 235, 240, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .award-icon {
+    grid-row: 1 / 3;
+    align-self: center;
+    color: var(--muted);
+    font-size: 1.15rem;
+  }
+
+  .award-name {
+    min-width: 0;
+    color: var(--ink-soft);
+    font: 600 0.78rem var(--font-sans);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .award-cat,
+  .award-desc {
+    grid-column: 2;
+    color: var(--muted);
+    font: 0.67rem/1.35 var(--font-mono);
+  }
+
+  .award-desc {
+    margin-top: 0.15rem;
+  }
+
+  .award-val {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+    color: var(--ink-soft);
+    font: 600 0.72rem var(--font-mono);
+    white-space: nowrap;
+  }
+
+  /* --------------------------------------------------------------------------
+     Solves table
+     -------------------------------------------------------------------------- */
+
+  .profile-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .profile-table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  .profile-table th,
+  .profile-table td {
+    padding: 0.8rem 1.15rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .profile-table th {
+    background: rgba(255, 255, 255, 0.018);
+    color: var(--muted);
+    font: 500 0.65rem var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .profile-table td {
+    color: var(--ink-soft);
+    font: 0.78rem var(--font-mono);
+  }
+
+  .profile-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .profile-table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .profile-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .profile-table a {
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+
+  .profile-table a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .profile-table-value {
+    white-space: nowrap;
+  }
+
+  .profile-table-time {
+    color: var(--muted) !important;
+    white-space: nowrap;
+  }
+
+  /* --------------------------------------------------------------------------
+     Performance section
+     -------------------------------------------------------------------------- */
+
+  .profile-performance {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1.15rem;
+  }
+
+  .performance-card {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .performance-card--wide {
+    grid-column: 1 / -1;
+  }
+
+  .performance-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .performance-title-text {
+    color: var(--muted);
+    font: 0.67rem var(--font-mono);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .performance-title-value {
+    color: var(--ink-soft);
+    font: 600 0.72rem var(--font-mono);
+  }
+
+  /* Main solve/fail percentage bar */
+
+  .performance-bar {
+    display: flex;
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .performance-bar__segment {
+    height: 100%;
+    min-width: 0;
+    transition: width 0.5s ease;
+  }
+
+  .performance-bar__solves {
+    background: rgb(0, 209, 64);
+  }
+
+  .performance-bar__fails {
+    background: rgb(207, 38, 0);
+  }
+
+  .performance-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 0.7rem;
+  }
+
+  .performance-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--muted);
+    font: 0.67rem var(--font-mono);
+  }
+
+  .performance-legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+
+  .performance-legend-dot--solve {
+    background: rgb(0, 209, 64);
+  }
+
+  .performance-legend-dot--fail {
+    background: rgb(207, 38, 0);
+  }
+
+  /* Category percentage bar */
+
+  .category-bar {
+    display: flex;
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .category-bar__segment {
+    height: 100%;
+    min-width: 0;
+    transition: width 0.5s ease;
+  }
+
+  .category-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1rem;
+    margin-top: 0.7rem;
+  }
+
+  .category-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--muted);
+    font: 0.67rem var(--font-mono);
+  }
+
+  .category-legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+
+  /* --------------------------------------------------------------------------
+     Score graph
+     -------------------------------------------------------------------------- */
+
+  .score-graph {
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 1.2rem;
+    border-top: 1px solid var(--line);
+    background:
+      linear-gradient(
+        to bottom,
+        transparent 24.8%,
+        rgba(255, 255, 255, 0.035) 25%,
+        transparent 25.2%,
+        transparent 49.8%,
+        rgba(255, 255, 255, 0.035) 50%,
+        transparent 50.2%,
+        transparent 74.8%,
+        rgba(255, 255, 255, 0.035) 75%,
+        transparent 75.2%
+      );
+  }
+
+  .score-graph::before {
+    content: 'SCORE / TIME';
+    position: absolute;
+    top: 0.65rem;
+    left: 1rem;
+    color: var(--muted);
+    font: 0.6rem var(--font-mono);
+    letter-spacing: 0.12em;
+    opacity: 0.65;
+  }
+
+  .loading-gear {
+    width: 44px;
+    height: 44px;
+    color: var(--muted);
+    opacity: 0.55;
+    animation: profile-spin 3s linear infinite;
+  }
+
+  /* --------------------------------------------------------------------------
+     Empty state
+     -------------------------------------------------------------------------- */
+
+  .profile-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 2rem;
+    border: 1px dashed var(--line);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  .profile-empty p {
+    margin: 0;
+    color: var(--muted);
+    font: 0.75rem var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* --------------------------------------------------------------------------
+     Error area
+     -------------------------------------------------------------------------- */
+
+  .profile-errors {
+    margin-bottom: 1rem;
+  }
+
+  /* --------------------------------------------------------------------------
+     Responsive
+     -------------------------------------------------------------------------- */
+
+  @media (max-width: 900px) {
+    .profile-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+      width: 100%;
+    }
+
+    .profile-card {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .profile-performance {
+      grid-template-columns: 1fr;
+    }
+
+    .performance-card--wide {
+      grid-column: auto;
+    }
+
+    .awards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .profile-page {
+      padding-right: 0.75rem;
+      padding-left: 0.75rem;
+    }
+
+    .profile-header {
+      padding-top: 0.75rem;
+    }
+
+    .profile-header-title {
+      gap: 0.6rem;
+    }
+
+    .profile-header-gear {
+      width: 38px;
+      height: 38px;
+    }
+
+    .profile-header-name {
+      max-width: 65vw;
+      font-size: 1.5rem;
+    }
+
+    .profile-header-subtitle {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+    }
+
+    .profile-section-header {
+      padding: 0.85rem 0.9rem;
+    }
+
+    .profile-section-body {
+      padding: 0.9rem;
+    }
+
+    .profile-table {
+      min-width: 500px;
+    }
+
+    .profile-table th,
+    .profile-table td {
+      padding: 0.7rem 0.8rem;
+    }
+
+    .profile-performance {
+      padding: 0.9rem;
+    }
+  }
+
+  @keyframes profile-spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes profile-spin-reverse {
+    from {
+      transform: rotate(360deg);
+    }
+
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+/* ================================================================
+   PRIVATE PROFILE — ADDITIONS
+   ================================================================ */
+
+.profile-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.profile-section-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.profile-section-count {
+  flex: 0 0 auto;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--line);
+  color: var(--muted);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+
+/* ================================================================
+   AWARD CARD ADDITIONS
+   ================================================================ */
+
+.award-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.award-card__top .award-icon {
+  margin: 0;
+}
+
+.award-card__top .award-val {
+  margin: 0;
+}
+
+
+/* ================================================================
+   TABLE
+   ================================================================ */
+
+.profile-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+}
+
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.profile-table th {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+
+  color: var(--muted);
+  background: rgba(255, 255, 255, .018);
+
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.profile-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, .055);
+  white-space: nowrap;
+}
+
+.profile-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.profile-table tbody tr {
+  transition:
+    background-color .15s ease,
+    color .15s ease;
+}
+
+.profile-table tbody tr:hover {
+  background: rgba(255, 255, 255, .025);
+}
+
+.profile-table__challenge {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.profile-table__challenge:hover {
+  color: #fff;
+}
+
+.profile-table__category {
+  color: var(--muted);
+}
+
+.profile-table__value {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.solve-time {
+  color: var(--muted);
+}
+
+
+/* ================================================================
+   PERFORMANCE GRID
+   ================================================================ */
+
+.profile-performance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+
+  margin-top: 18px;
+  padding-bottom: 48px;
+}
+
+.performance-card {
+  min-width: 0;
+  padding: 20px;
+
+  border: 1px solid var(--line);
+  background: rgba(8, 10, 11, .72);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .025);
+
+  backdrop-filter: blur(8px);
+}
+
+.performance-card--wide {
+  grid-column: 1 / -1;
+}
+
+.performance-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.performance-card__title {
+  margin: 0;
+
+  color: var(--ink-soft);
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+
+/* ================================================================
+   SOLVE / FAIL BAR
+   ================================================================ */
+
+.performance-bar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, .055);
+}
+
+.performance-bar__segment {
+  height: 100%;
+  min-width: 0;
+  transition: width .5s ease;
+}
+
+.performance-bar__solves {
+  background: rgb(0, 209, 64);
+}
+
+.performance-bar__fails {
+  background: rgb(207, 38, 0);
+}
+
+.performance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+
+  margin-top: 12px;
+}
+
+.performance-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+
+.performance-dot,
+.category-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  display: inline-block;
+}
+
+
+/* ================================================================
+   CATEGORY BAR
+   ================================================================ */
+
+.category-bar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, .055);
+}
+
+.category-bar__segment {
+  height: 100%;
+  min-width: 0;
+  transition: width .5s ease;
+}
+
+.category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+
+  margin-top: 12px;
+}
+
+.category-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+
+@media (max-width: 700px) {
+  .profile-performance {
+    grid-template-columns: 1fr;
+  }
+
+  .performance-card--wide {
+    grid-column: auto;
+  }
+
+  .profile-section-header {
+    align-items: center;
+  }
+
+  .profile-table {
+    min-width: 0;
+  }
+
+  .profile-table__category {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .performance-card {
+    padding: 15px;
+  }
+
+  .profile-table th,
+  .profile-table td {
+    padding: 11px 12px;
+  }
+
+  .profile-table {
+    font-size: 10px;
+  }
+
+  .profile-table th {
+    font-size: 8px;
+  }
+
+  .performance-legend,
+  .category-legend {
+    gap: 8px 14px;
+  }
+}
+
+</style>
+
+  <div class="profile-hero">
+    <div class="profile-hero-inner">
+      <div class="profile-avatar-wrap" aria-hidden="true">
+        <svg class="profile-gear spin-cw" viewBox="-36 -36 72 72">
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z"
+          />
+          <circle fill="none" stroke="currentColor" stroke-width="1.4" r="20"/>
+          <circle fill="none" stroke="currentColor" stroke-width="1.8" r="8"/>
+        </svg>
       </div>
 
-      {% if user.bracket_id %}
-        <div class="pt-2">
-          <h2>
-            <span class="badge text-bg-light">
+      <div class="profile-info">
+        <h1 class="profile-name">{{ user.name }}</h1>
+
+        <div class="profile-badges">
+          {% if user.oauth_id %}
+            <a
+              href="https://majorleaguecyber.org/u/{{ user.name }}"
+              class="profile-badge profile-badge--official"
+              target="_blank"
+              rel="noopener"
+            >
+              {% trans %}Official{% endtrans %}
+            </a>
+          {% endif %}
+
+          {% if user.affiliation %}
+            <span class="profile-badge">
+              {{ user.affiliation }}
+            </span>
+          {% endif %}
+
+          {% if user.country %}
+            <span class="profile-badge">
+              <i class="flag-{{ user.country.lower() }}"></i>
+              {{ lookup_country_code(user.country) }}
+            </span>
+          {% endif %}
+
+          {% if user.bracket_id %}
+            <span class="profile-badge profile-badge--bracket">
               {{ user.bracket.name }}
             </span>
-          </h2>
+          {% endif %}
         </div>
-      {% endif %}
 
-      <div class="pt-2">
         {% for field in user.fields %}
-          <h3 class="d-block">
-            {{ field.name }}: {{ field.value }}
-          </h3>
+          <p class="profile-field">
+            <span>{{ field.name }}</span>
+            {{ field.value }}
+          </p>
         {% endfor %}
-      </div>
 
-      {% if user.fields %}
-        <hr class="w-50 mx-auto">
-      {% endif %}
-
-      <div>
-        <h2 class="text-center">
-          {% if account.place %}
-            {{ account.place }} <small>place</small>
-          {% endif %}
-        </h2>
-        <h2 class="text-center">
-          {% if account %}
-            {{ account.get_score(admin=True) }} <small>points</small>
-          {% endif %}
-        </h2>
-      </div>
-
-      <div class="pt-3">
         {% if user.website %}
-          <a href="{{ user.website }}" target="_blank" style="color: inherit;" rel="noopener">
-            <i
-                class="fas fa-external-link-alt fa-2x px-2" data-toggle="tooltip" data-placement="top"
-                title="{{ user.website }}"
-            ></i>
+          <a
+            href="{{ user.website }}"
+            target="_blank"
+            class="profile-website"
+            rel="noopener"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              width="14"
+              height="14"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zM8 4c-.9 0-2 .5-2.6 1.4l1.1.8A1.6 1.6 0 0 1 8 5.5c.9 0 1.5.7 1.5 1.5S8.9 8.5 8 8.5H7.5V10H8c1.7 0 3-1.3 3-3S9.7 4 8 4zm-.75 7v1.5h1.5V11H7.25z"
+                fill="currentColor"
+              />
+            </svg>
+            {{ user.website }}
           </a>
         {% endif %}
+
+        <div class="profile-stats">
+          {% if account.place %}
+            <div class="profile-stat">
+              <span class="profile-stat__val">{{ account.place }}</span>
+              <span class="profile-stat__label">place</span>
+            </div>
+          {% endif %}
+
+          {% if account %}
+            <div class="profile-stat">
+              <span class="profile-stat__val">
+                {{ account.get_score(admin=True) }}
+              </span>
+              <span class="profile-stat__label">points</span>
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
-  <div class="container">
+
+  <main class="profile-page">
     {% include "components/errors.html" %}
 
     {% set solves = user.solves %}
     {% set awards = user.awards %}
 
     {% if solves or awards %}
-      {% if awards %}
-        <div class="row">
-          <div class="col-md-12">
-            <h3>{% trans %}Awards{% endtrans %}</h3>
 
-          </div>
-          {% for award in awards %}
-            <div class="col-md-3 col-sm-6">
-              <p class="text-center">
-                <i class="award-icon award-{{ award.icon }} fa-2x"></i>
-                <br>
-                <strong>{{ award.name }}</strong>
-              </p>
-              <p class="text-center">{{ award.category or "" }}</p>
-              <p class="text-center">{{ award.description or "" }}</p>
-              <p class="text-center">{{ award.value }}</p>
+      {# ================================================================
+         AWARDS
+         ================================================================ #}
+
+      {% if awards %}
+        <section class="profile-section">
+          <div class="profile-section-header">
+            <div>
+              <span class="profile-section-label">SYSTEM RECORD</span>
+              <h2 class="profile-section-title">
+                {% trans %}Awards{% endtrans %}
+              </h2>
             </div>
-          {% endfor %}
-        </div>
+
+            <span class="profile-section-count">
+              {{ awards | length }}
+            </span>
+          </div>
+
+          <div class="awards-grid">
+            {% for award in awards %}
+              <article class="award-card">
+                <div class="award-card__top">
+                  <i
+                    class="award-icon award-{{ award.icon }}"
+                    aria-hidden="true"
+                  ></i>
+
+                  <span class="award-val">
+                    {{ award.value }}
+                  </span>
+                </div>
+
+                <strong class="award-name">
+                  {{ award.name }}
+                </strong>
+
+                {% if award.category %}
+                  <span class="award-cat">
+                    {{ award.category }}
+                  </span>
+                {% endif %}
+
+                {% if award.description %}
+                  <span class="award-desc">
+                    {{ award.description }}
+                  </span>
+                {% endif %}
+              </article>
+            {% endfor %}
+          </div>
+        </section>
       {% endif %}
 
-      <br>
 
-      <div class="row">
-        <div class="col-md-12">
-          <h3>{% trans %}Solves{% endtrans %}</h3>
-          <table class="table table-striped align-middle">
+      {# ================================================================
+         SOLVES
+         ================================================================ #}
+
+      <section class="profile-section">
+        <div class="profile-section-header">
+          <div>
+            <span class="profile-section-label">CHALLENGE LOG</span>
+            <h2 class="profile-section-title">
+              {% trans %}Solves{% endtrans %}
+            </h2>
+          </div>
+
+          <span class="profile-section-count">
+            {{ solves | length }}
+          </span>
+        </div>
+
+        <div class="profile-table-wrap">
+          <table class="profile-table">
             <thead>
-            <tr>
-              <th>{% trans %}Challenge{% endtrans %}</th>
-              <th class="d-none d-md-block d-lg-block">{% trans %}Category{% endtrans %}</th>
-              <th>{% trans %}Value{% endtrans %}</th>
-              <th>{% trans %}Time{% endtrans %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for solve in solves %}
               <tr>
-                <td>
-                  <a href="{{ url_for('challenges.listing') }}#{{ solve.challenge.name }}-{{ solve.challenge.id }}">
-                    {{ solve.challenge.name }}
-                  </a>
-                </td>
-                <td class="d-none d-md-block d-lg-block">{{ solve.challenge.category }}</td>
-                <td>{{ solve.challenge.value }}</td>
-                <td class="solve-time">
-                  <span data-time="{{ solve.date | isoformat }}"></span>
-                </td>
+                <th>{% trans %}Challenge{% endtrans %}</th>
+                <th class="profile-table__category">
+                  {% trans %}Category{% endtrans %}
+                </th>
+                <th>{% trans %}Value{% endtrans %}</th>
+                <th>{% trans %}Time{% endtrans %}</th>
               </tr>
-            {% endfor %}
+            </thead>
+
+            <tbody>
+              {% for solve in solves %}
+                <tr>
+                  <td>
+                    <a
+                      href="{{ url_for('challenges.listing') }}#{{ solve.challenge.name }}-{{ solve.challenge.id }}"
+                      class="profile-table__challenge"
+                    >
+                      {{ solve.challenge.name }}
+                    </a>
+                  </td>
+
+                  <td class="profile-table__category">
+                    {{ solve.challenge.category }}
+                  </td>
+
+                  <td class="profile-table__value">
+                    {{ solve.challenge.value }}
+                  </td>
+
+                  <td class="solve-time">
+                    <span
+                      data-time="{{ solve.date | isoformat }}"
+                    ></span>
+                  </td>
+                </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <div class="clearfix"></div>
 
-      <div class="row" x-data="UserGraphs">
-        <div class="col-md-6 d-none d-md-block d-lg-block py-4">
-          <div class="progress">
-            <div 
-              class="progress-bar" 
-              role="progressbar" 
-              :style="{ width: `${getSolvePercentage()}%`, 'background-color': 'rgb(0, 209, 64)' }" 
-            >
+      {# ================================================================
+         PERFORMANCE
+         ================================================================ #}
+
+      <section
+        class="profile-performance"
+        x-data="UserGraphs"
+      >
+
+        {# Solve / Fail percentage #}
+        <article class="performance-card">
+          <div class="performance-card__header">
+            <div>
+              <span class="profile-section-label">
+                ATTEMPT DISTRIBUTION
+              </span>
+
+              <h3 class="performance-card__title">
+                Solve / Fail Ratio
+              </h3>
             </div>
-            <div 
-              class="progress-bar" 
-              role="progressbar" 
-              :style="{ width: `${getFailPercentage()}%`, 'background-color': 'rgb(207, 38, 0)' }"
-            >
+          </div>
+
+          <div class="performance-bar">
+            <div
+              class="performance-bar__segment performance-bar__solves"
+              role="progressbar"
+              :style="{ width: `${getSolvePercentage()}%` }"
+              :aria-valuenow="getSolvePercentage()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+
+            <div
+              class="performance-bar__segment performance-bar__fails"
+              role="progressbar"
+              :style="{ width: `${getFailPercentage()}%` }"
+              :aria-valuenow="getFailPercentage()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+
+          <div class="performance-legend">
+            <div class="performance-legend__item">
+              <span class="performance-dot performance-dot--solve"></span>
+              <span x-text="`Solves (${getSolvePercentage()}%)`"></span>
+            </div>
+
+            <div class="performance-legend__item">
+              <span class="performance-dot performance-dot--fail"></span>
+              <span x-text="`Fails (${getFailPercentage()}%)`"></span>
             </div>
           </div>
-          <div class="ps-2 float-start">
-            <svg height="16" width="16">
-              <circle cx="8" cy="8" r="5" fill="rgb(0, 209, 64)" />
-            </svg>
-            <small x-text="`Solves (${getSolvePercentage()}%)`"></small>
+        </article>
+
+
+        {# Category distribution #}
+        <article class="performance-card">
+          <div class="performance-card__header">
+            <div>
+              <span class="profile-section-label">
+                CATEGORY ANALYSIS
+              </span>
+
+              <h3 class="performance-card__title">
+                Solve Distribution
+              </h3>
+            </div>
           </div>
-          <div class="ps-2 float-start">
-            <svg height="16" width="16">
-              <circle cx="8" cy="8" r="5" fill="rgb(207, 38, 0)" />
-            </svg>
-            <small x-text="`Fails (${getFailPercentage()}%)`"></small>
+
+          <div class="category-bar">
+            <template
+              x-for="category in getCategoryBreakdown()"
+              :key="category.name"
+            >
+              <div
+                class="category-bar__segment"
+                role="progressbar"
+                :style="{
+                  width: `${category.percent}%`,
+                  backgroundColor: category.color
+                }"
+                :aria-valuenow="category.percent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </template>
           </div>
-        </div>
-        <div class="col-md-6 d-none d-md-block d-lg-block py-4">
-          <div class="progress">
-            <template x-for="category in getCategoryBreakdown()" :key="category.name">
-              <div 
-                class="progress-bar" 
-                role="progressbar" 
-                :style="{ width: `${category.percent}%`, 'background-color': category.color }"
-              >
+
+          <div class="category-legend">
+            <template
+              x-for="category in getCategoryBreakdown()"
+              :key="category.name"
+            >
+              <div class="category-legend__item">
+                <span
+                  class="category-dot"
+                  :style="{ backgroundColor: category.color }"
+                ></span>
+
+                <span
+                  x-text="`${category.name} (${category.percent}%)`"
+                ></span>
               </div>
             </template>
           </div>
-          <template x-for="category in getCategoryBreakdown()" :key="category.name">
-            <div class="ps-2 float-start">
-              <svg height="16" width="16">
-                <circle cx="8" cy="8" r="5" :fill="category.color" />
-              </svg>
-              <small x-text="`${category.name} (${category.percent}%)`"></small>
-            </div>
-          </template>
-        </div>
-        <br class="clearfix">
-        <div class="col-md-12 d-none d-md-block d-lg-block py-4">
-          <div id="score-graph" x-ref="scoregraph" class="w-100 d-flex align-items-center">
-            <div class="text-center w-100">
-              <i class="fas fa-circle-notch fa-spin fa-3x fa-fw spinner"></i>
+        </article>
+
+
+        {# Score graph #}
+        <article class="performance-card performance-card--wide">
+          <div class="performance-card__header">
+            <div>
+              <span class="profile-section-label">
+                PERFORMANCE TRACE
+              </span>
+
+              <h3 class="performance-card__title">
+                Score History
+              </h3>
             </div>
           </div>
-        </div>
-      </div>
+
+          <div
+            id="score-graph"
+            x-ref="scoregraph"
+            class="score-graph"
+          >
+            <svg
+              class="loading-gear"
+              viewBox="-36 -36 72 72"
+              aria-hidden="true"
+            >
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z"
+              />
+              <circle
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                r="20"
+              />
+              <circle
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                r="8"
+              />
+            </svg>
+          </div>
+        </article>
+
+      </section>
+
     {% else %}
-      <div class="row min-vh-25">
-        <h3 class="opacity-50 text-center w-100 justify-content-center align-self-center">
-          {% trans %}No solves yet{% endtrans %}
-        </h3>
-      </div>
+
+      <section class="notif-empty">
+        <p>{% trans %}No solves yet{% endtrans %}</p>
+      </section>
+
     {% endif %}
-  </div>
+  </main>
 {% endblock %}
+
 
 {% block scripts %}
   {{ Assets.js("assets/js/users/private.js") }}
 {% endblock %}
-

@@ -1,15 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="jumbotron">
-    <div class="container">
-      <h1>
+  <svg width="0" height="0" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <!-- Standard 10-tooth mechanical gear -->
+      <g id="gear-10t">
+        <path fill="none" stroke="currentColor" stroke-width="1.6" d="M -2.5,-8.5 L -2,-10.5 L 2,-10.5 L 2.5,-8.5 L 5,-7.5 L 7,-8.5 L 8.5,-7 L 7.5,-5 L 8.5,-2.5 L 10.5,-2 L 10.5,2 L 8.5,2.5 L 7.5,5 L 8.5,7 L 7,8.5 L 5,7.5 L 2.5,8.5 L 2,10.5 L -2,10.5 L -2.5,8.5 L -5,7.5 L -7,8.5 L -8.5,7 L -7.5,5 L -8.5,2.5 L -10.5,2 L -10.5,-2 L -8.5,-2.5 L -7.5,-5 L -8.5,-7 L -7,-8.5 L -5,-7.5 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" cx="0" cy="0" r="3" />
+      </g>
+
+      <!-- Large header gear with spokes and hub -->
+      <g id="gear-large-spokes">
+        <path fill="none" stroke="currentColor" stroke-width="1.8" d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" cx="0" cy="0" r="20" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.8" cx="0" cy="0" r="8" />
+        <line x1="0" y1="-8" x2="0" y2="-20" stroke="currentColor" stroke-width="1.2" />
+        <line x1="0" y1="8" x2="0" y2="20" stroke="currentColor" stroke-width="1.2" />
+        <line x1="-6.9" y1="-4" x2="-17.3" y2="-10" stroke="currentColor" stroke-width="1.2" />
+        <line x1="6.9" y1="4" x2="17.3" y2="10" stroke="currentColor" stroke-width="1.2" />
+        <line x1="-6.9" y1="4" x2="-17.3" y2="10" stroke="currentColor" stroke-width="1.2" />
+        <line x1="6.9" y1="-4" x2="17.3" y2="-10" stroke="currentColor" stroke-width="1.2" />
+      </g>
+    </defs>
+  </svg>
+
+  <header class="header-band">
+    <div class="header-title-wrap">
+      <svg class="header-gear left-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-spokes" />
+      </svg>
+      <h1 class="page-title">
         {% trans %}Challenges{% endtrans %}
       </h1>
+      <svg class="header-gear right-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-spokes" />
+      </svg>
     </div>
-  </div>
+    <p class="header-subtitle">{% trans %}World Line Divergence Protocols{% endtrans %}</p>
+  </header>
 
-  <div class="container">
+  <div class="container" style="max-width: 1120px; padding-bottom: 5rem;">
     <div class="row">
       <div class="col-md-12">
         {% include "components/errors.html" %}
@@ -27,47 +57,50 @@
       ></div>
 
       <div x-show="!loaded">
-        <div class="min-vh-50 d-flex align-items-center">
-          <div class="text-center w-100">
-            <i class="fas fa-circle-notch fa-spin fa-3x fa-fw spinner"></i>
-          </div>
+        <div class="loading-state">
+          <svg class="loading-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+            <use href="#gear-large-spokes"/>
+          </svg>
+          <span>{% trans %}Initializing Divergence Protocols...{% endtrans %}</span>
         </div>
       </div>
 
-      <div x-show="loaded">
+      <div x-show="loaded" style="display: none;">
         <template x-for="(category, idx) in getCategories()" :key="idx">
-          <div class="pt-5">
-            <div class="category-header mb-3">
-              <h3 x-text="category"></h3>
+          <section class="category-section">
+            <div class="category-header">
+              <svg class="category-gear-icon" viewBox="-12 -12 24 24" aria-hidden="true">
+                <use href="#gear-10t"/>
+              </svg>
+              <span x-text="category"></span>
             </div>
 
-            <div class="category-challenges d-flex flex-column">
-              <div class="challenges-row row">
-                <template x-for="(c, idx) in getChallenges(category)" :key="c.id">
-                  <div class="col-sm-6 col-md-4 col-lg-3 my-3">
-                    <button
-                        class="challenge-button btn btn-dark w-100 h-100"
-                        :class="[
-                          c.solved_by_me ? 'challenge-solved' : '',
-                          ...c.tags.map((tag) => `tag-${tag.value.replace(/ /g, '-')}`),
-                        ];"
-                        :value="c.id" @click="loadChallenge(c.id)"
-                    >
-
-                      <div class="challenge-inner my-3">
-                        <p x-text="c.name"></p>
-                        <span x-text="c.value"></span>
-                      </div>
-                    </button>
-                  </div>
-                </template>
-              </div>
+            <div class="challenges-grid">
+              <template x-for="(c, idx) in getChallenges(category)" :key="c.id">
+                <button
+                    class="challenge-card"
+                    :class="[
+                      c.solved_by_me ? 'solved' : '',
+                      ...c.tags.map((tag) => `tag-${String(tag.value || tag).replace(/ /g, '-')}`)
+                    ]"
+                    :value="c.id" 
+                    @click="loadChallenge(c.id)"
+                    type="button"
+                >
+                  <svg class="card-corner-gear" viewBox="-12 -12 24 24" aria-hidden="true">
+                    <use href="#gear-10t"/>
+                  </svg>
+                  <h3 class="card-title" x-text="c.name"></h3>
+                  <p class="card-points" x-text="c.value"></p>
+                </button>
+              </template>
             </div>
-          </div>
+          </section>
         </template>
       </div>
     </div>
   </div>
+  
 {% endblock %}
 
 {% block scripts %}

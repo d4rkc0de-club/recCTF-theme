@@ -1,68 +1,726 @@
 {% extends "base.html" %}
 
+{% block stylesheets %}
+  {{ super() }}
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+
+:root {
+  --line: rgba(0, 0, 0, 0.16);
+  --line-faint: rgba(0, 0, 0, 0.08);
+  --paper-1: #ffffff;
+  --paper-ink: #333333;
+  --paper-muted: #666666;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-mono: 'Share Tech Mono', monospace;
+
+  --gold: #c5a44e; --gold-light: #e8d48b; --gold-dark: #8b7230;
+  --silver: #a8a8b0; --silver-light: #d0d0d6; --silver-dark: #6e6e76;
+  --bronze: #a67c52; --bronze-light: #ccaa7e; --bronze-dark: #6e5038;
+}
+body.theme-dark {
+  --line: rgba(235, 235, 240, 0.16);
+  --line-faint: rgba(235, 235, 240, 0.08);
+  --paper-1: #2a2a2d;
+  --paper-ink: #ececee;
+  --paper-muted: #9a9a9f;
+
+  --gold: #d4b45a; --gold-light: #f0e09a; --gold-dark: #9a8040;
+  --silver: #b8b8c0; --silver-light: #e0e0e6; --silver-dark: #808088;
+  --bronze: #b88c60; --bronze-light: #dcba90; --bronze-dark: #806040;
+}
+
+.podium-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  animation: rise 1.4s .4s cubic-bezier(.2, .7, .2, 1) both;
+}
+.podium-svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,.18)) drop-shadow(0 1px 3px rgba(0,0,0,.12));
+}
+.podium-gear-body {
+  stroke-width: 1.5;
+  transition: filter .3s ease;
+}
+.gear-tick-ring {
+  fill: none;
+  stroke-width: 0.8;
+  opacity: .5;
+}
+.gear-tick {
+  stroke-width: 0.6;
+  opacity: .4;
+}
+.gear-tick.major {
+  stroke-width: 1.2;
+  opacity: .6;
+}
+.gear-numeral {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  opacity: .35;
+}
+.gear-ring-detail {
+  fill: none;
+  stroke-width: 0.5;
+  opacity: .2;
+}
+.gear-hub-outer {
+  stroke-width: 1.5;
+}
+.gear-hub-inner {
+  stroke-width: 1;
+}
+.gear-spoke-line {
+  stroke-width: 0.8;
+  opacity: .3;
+}
+.gear-label {
+  pointer-events: none;
+}
+.gear-name {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+.gear-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  opacity: .9;
+}
+.gear-place {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  stroke: var(--paper-1);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  opacity: .8;
+}
+.podium-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: breathe 2s ease-in-out infinite;
+}
+.mini-gear { display: inline-block; }
+.mini-gear svg { width: 100%; height: 100%; display: block; }
+.mini-gear path { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.mini-gear circle { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.podium-loading .mini-gear {
+  width: 40px;
+  height: 40px;
+  color: var(--muted);
+  animation: spin 4s linear infinite;
+}
+.podium-loading p {
+  margin: 0;
+  font: .72rem var(--font-mono);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@keyframes spin { to { rotate: 360deg; } }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px) scale(.985); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .45; }
+}
+@keyframes gear-spin-cw { to { transform: rotate(360deg); } }
+@keyframes gear-spin-ccw { to { transform: rotate(-360deg); } }
+
+@media (max-width: 600px) {
+  .podium-container { transform: scale(0.7); transform-origin: center center; }
+}
+@media (max-width: 420px) {
+  .podium-container { transform: scale(0.55); transform-origin: center center; }
+}
+@media (max-height: 640px) {
+  .podium-container { transform: scale(0.65); transform-origin: center center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .gear-rotating { animation: none !important; }
+}
+  
+.standings-board {
+  width: min(600px, calc(100vw - 32px));
+  margin: 1rem auto 3rem;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.04), transparent 8px, transparent calc(100% - 8px), rgba(0,0,0,.04)),
+    linear-gradient(90deg, rgba(0,0,0,.04), transparent 8px, transparent calc(100% - 8px), rgba(0,0,0,.04)),
+    var(--paper-1);
+  border: 1px solid var(--line-faint);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  animation: rise 1.4s .6s cubic-bezier(.2, .7, .2, 1) both;
+}
+body.theme-dark .standings-board {
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  border-color: rgba(255,255,255,.05);
+}
+.board-inner {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.3) transparent;
+}
+body.theme-dark .board-inner {
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+.standings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+.standings-list li {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: center;
+  column-gap: 1rem;
+  padding-bottom: .8rem;
+  border-bottom: 1px dashed var(--line-faint);
+  color: var(--paper-ink);
+}
+.standings-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.standing-rank {
+  width: 2.6rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  box-shadow: 0 0 0 3px var(--paper-1), 0 0 0 4px var(--line-faint);
+  font: 700 .95rem var(--font-serif);
+}
+.standing-name {
+  font: 600 1.1rem / 1.25 var(--font-serif);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.standing-name a {
+  color: inherit;
+  text-decoration: none;
+}
+.standing-name a:hover {
+  text-decoration: underline;
+}
+.standing-score {
+  font: .9rem var(--font-mono);
+  color: var(--paper-muted);
+}
+
+</style>
+{% endblock %}
+
 {% block content %}
-  <div class="jumbotron">
-    <div class="container">
-      <h1>
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+    <defs>
+      <g id="gear-large-sb">
+        <path fill="none" stroke="currentColor" stroke-width="1.8" d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z" />
+        <circle fill="none" stroke="currentColor" stroke-width="1.4" r="20"/>
+        <circle fill="none" stroke="currentColor" stroke-width="1.8" r="8"/>
+        <line x1="0" y1="-8" x2="0" y2="-20" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="0" y1="8" x2="0" y2="20" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="-6.9" y1="-4" x2="-17.3" y2="-10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6.9" y1="4" x2="17.3" y2="10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="-6.9" y1="4" x2="-17.3" y2="10" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6.9" y1="-4" x2="17.3" y2="-10" stroke="currentColor" stroke-width="1.2"/>
+      </g>
+    </defs>
+  </svg>
+
+  <header class="header-band">
+    <div class="header-title-wrap">
+      <svg class="header-gear left-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-sb" />
+      </svg>
+      <h1 class="page-title">
         {% trans %}Scoreboard{% endtrans %}
       </h1>
+      <svg class="header-gear right-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+        <use href="#gear-large-sb" />
+      </svg>
     </div>
-  </div>
+    <p class="header-subtitle">{% trans %}Operative Rankings{% endtrans %}</p>
+  </header>
+
   <div class="container">
     {% include "components/errors.html" %}
 
-    <div id="score-graph" class="align-items-center" :class="{'d-flex': show, 'd-none': !show}" x-data="ScoreboardDetail" x-ref="scoregraph" @bracket-change.window="activeBracket=$event.detail; update();">
+    <div id="score-graph" class="align-items-center" :class="{'d-flex': show, 'd-none': !show}"
+         x-data="ScoreboardDetail" x-ref="scoregraph"
+         @bracket-change.window="activeBracket=$event.detail; update();">
       <div class="col-md-12 text-center">
-        <i class="fas fa-circle-notch fa-spin fa-3x fa-fw spinner"></i>
+        <svg class="loading-gear" viewBox="-36 -36 72 72" aria-hidden="true">
+          <use href="#gear-large-sb"/>
+        </svg>
       </div>
     </div>
 
     <div id="scoreboard" class="row" x-data="ScoreboardList">
+
+      <!-- Podium: three interlocking gears -->
+      <div class="col-md-12 d-flex justify-content-center align-items-center w-100 mb-4"
+           x-effect="if (standings.length) { 
+                       const filtered = standings.filter(i => activeBracket ? i.bracket_id==activeBracket : true);
+                       window.currentStandings = filtered;
+                       if (window.buildPodium) {
+                         const loading = document.getElementById('podium-loading');
+                         if (loading) loading.style.display = 'none';
+                         window.buildPodium(filtered);
+                       }
+                     }">
+        <div class="podium-container" role="img" aria-label="Top three scorers displayed as interlocking gears">
+          <!-- Loading state -->
+          <div id="podium-loading" class="podium-loading">
+            <i class="mini-gear"></i>
+            <p>Fetching standings…</p>
+          </div>
+          <!-- Gears render here -->
+          <div id="podium-area"></div>
+        </div>
+      </div>
+
       <template x-if="brackets.length && standings.length">
         <div class="col-md-12 py-3">
           <nav class="nav nav-pills nav-fill">
-            <button :class="{'nav-link': true, 'active': !activeBracket}" @click="activeBracket=null">{% trans %}All{% endtrans %}</button>
+            <button :class="{'nav-link': true, 'active': !activeBracket}" @click="activeBracket=null">
+              {% trans %}All{% endtrans %}
+            </button>
             <template x-for="bracket in brackets">
-              <button :class="{'nav-link': true, 'active': activeBracket == bracket.id}" x-text="bracket.name" @click="activeBracket=bracket.id"></button>
+              <button :class="{'nav-link': true, 'active': activeBracket == bracket.id}"
+                      x-text="bracket.name" @click="activeBracket=bracket.id"></button>
             </template>
           </nav>
         </div>
       </template>
 
-      <div class="col-md-12" x-show="standings.length">
-        <table class="table table-striped align-middle">
-          <thead>
-          <tr>
-            <th style="width: 10px">{% trans %}Place{% endtrans %}</th>
-            <th class="text-start ps-3">{{ get_mode_as_word(capitalize=True) }}</th>
-            <th>{% trans %}Score{% endtrans %}</th>
-          </tr>
-          </thead>
-
-          <tbody>
-            <template x-for="(standing, index) in standings.filter(i => activeBracket ? i.bracket_id==activeBracket : true)">
-              <tr>
-                <th scope="row" class="text-center" x-text="index + 1"></th>
-                <td class="text-start">
-                  <a :href="standing.account_url" x-text="standing.name"></a>
-                  <template x-if="standing.bracket_name">
-                    <span class="badge bg-secondary ms-2" x-text="standing.bracket_name"></span>
-                  </template>
-                </td>
-                <td x-text="standing.score"></td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
+      <div class="col-md-12 d-flex justify-content-center" x-show="standings.length">
+        <div class="standings-board">
+          <div class="board-inner">
+            <ul class="standings-list">
+              <template x-for="(standing, index) in standings.filter(i => activeBracket ? i.bracket_id==activeBracket : true)">
+                <li>
+                  <div class="standing-rank" x-text="index + 1"></div>
+                  <div class="standing-name text-start">
+                    <a :href="standing.account_url" x-text="standing.name"></a>
+                    <template x-if="standing.bracket_name">
+                      <span class="badge bg-secondary ms-2" x-text="standing.bracket_name"></span>
+                    </template>
+                  </div>
+                  <div class="standing-score" x-text="standing.score + ' pts'"></div>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <div class="col-md-12" x-show="! standings.length">
-        <h3 class="text-center text-muted">{% trans %}Scoreboard is empty{% endtrans %}</h3>
+        <p class="text-muted text-center py-5" style="font-family:var(--font-serif);font-size:1.2rem;">
+          {% trans %}No operatives on the board yet{% endtrans %}
+        </p>
       </div>
     </div>
   </div>
 {% endblock %}
 
 {% block scripts %}
+  <script>
+
+(() => {
+  'use strict';
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+
+  const el = (tag, attrs = {}, parent) => {
+    const node = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) node.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(node);
+    return node;
+  };
+
+  function gearPath(teeth, r, m) {
+    const ro = r + m;
+    const rr = r - 1.25 * m;
+    const p = TAU / teeth;
+    const pt = (rad, a) => `${(rad * Math.cos(a)).toFixed(2)} ${(rad * Math.sin(a)).toFixed(2)}`;
+    let d = '';
+    for (let i = 0; i < teeth; i++) {
+      const b = i * p;
+      d += (i ? 'L' : 'M') + pt(rr, b);
+      d += 'L' + pt(ro, b + p * 0.2);
+      d += 'L' + pt(ro, b + p * 0.45);
+      d += 'L' + pt(rr, b + p * 0.65);
+    }
+    return d + 'Z';
+  }
+
+
+  const PLACEHOLDER = [
+    { name: 'Lab Member 001', score: 4200 },
+    { name: 'Lab Member 002', score: 3850 },
+    { name: 'Lab Member 003', score: 3100 },
+  ];
+
+  // All three gears share the same module so teeth can mesh.
+  const M = 5.0;
+  const GOLD_T = 36;   // gold gear teeth
+  const SILVER_T = 30; // silver gear teeth
+  const BRONZE_T = 24; // bronze gear teeth
+  const GOLD_R = (M * GOLD_T) / 2;     // pitch radius 90
+  const SILVER_R = (M * SILVER_T) / 2; // pitch radius 75
+  const BRONZE_R = (M * BRONZE_T) / 2; // pitch radius 60
+
+  // Gear rotation periods (seconds per full turn), proportional to teeth
+  // so the tangential speed at the pitch circle is identical = they mesh.
+  const BASE_PERIOD = 1.2; // seconds per tooth
+
+  // Placement angles for the two side gears relative to gold centre
+  const ANG_R = 25 * (Math.PI / 180);            // silver (right-of-centre, below gold)
+  const ANG_L = Math.PI - 25 * (Math.PI / 180);  // bronze (left-of-centre, below gold)
+  const DIST_S = GOLD_R + SILVER_R;               // pitch-circle tangent distance (silver)
+  const DIST_B = GOLD_R + BRONZE_R;               // pitch-circle tangent distance (bronze)
+
+  // Centre positions
+  const GX = 0, GY = 0;
+  const SX = GX + DIST_S * Math.cos(ANG_R);
+  const SY = GY + DIST_S * Math.sin(ANG_R);
+  const BX = GX + DIST_B * Math.cos(ANG_L);
+  const BY = GY + DIST_B * Math.sin(ANG_L);
+
+  // ViewBox bounds
+  const PAD = M + 8;
+  const vbL = BX - BRONZE_R - PAD;
+  const vbR = SX + SILVER_R + PAD;
+  const vbT = Math.min(GY - GOLD_R, SY - SILVER_R, BY - BRONZE_R) - PAD;
+  const vbB = Math.max(GY + GOLD_R, SY + SILVER_R, BY + BRONZE_R) + PAD;
+
+  // Mesh offset: so that a tooth of the gold gear lands in a gap of the side gear
+  function meshOffset(angle, teethA, teethB) {
+    const pA = TAU / teethA;
+    const pB = TAU / teethB;
+    const phase = ((angle / pA) % 1 + 1) % 1;
+    const base = angle + Math.PI;
+    return ((base - pB * (0.15 - phase)) * 180) / Math.PI;
+  }
+
+  const silverOffset = meshOffset(ANG_R, GOLD_T, SILVER_T);
+  const bronzeOffset = meshOffset(ANG_L, GOLD_T, BRONZE_T);
+
+  /* ---- Draw one podium gear (rotating body + static overlay label) ---- */
+  function drawGear(svg, cx, cy, teeth, pitchR, gradId, strokeCol, dir, offsetDeg, label) {
+    const tickR = pitchR * 0.68;
+    const hubR  = pitchR * 0.22;
+    const innerR = pitchR * 0.48;
+    const isGold = teeth === GOLD_T;
+    const period = teeth * BASE_PERIOD;
+
+    // Container group translated to gear centre
+    const container = el('g', { transform: `translate(${cx.toFixed(1)},${cy.toFixed(1)})` }, svg);
+
+    // Initial-offset wrapper (static transform so CSS animation adds on top)
+    const offsetWrap = el('g', { transform: `rotate(${offsetDeg.toFixed(2)})` }, container);
+
+    // Animated rotation group
+    const anim = el('g', { class: 'gear-rotating' }, offsetWrap);
+    if (!reduceMotion) {
+      const kf = dir > 0 ? 'gear-spin-cw' : 'gear-spin-ccw';
+      anim.style.animation = `${kf} ${period}s linear infinite`;
+      anim.style.transformOrigin = '0 0';
+    }
+
+    // -- Gear tooth body --
+    el('path', {
+      d: gearPath(teeth, pitchR, M),
+      class: 'podium-gear-body',
+      fill: `url(#${gradId})`,
+      stroke: strokeCol,
+    }, anim);
+
+    // -- Decorative rings --
+    [0.88, 0.78, 0.55, 0.35].forEach(frac => {
+      el('circle', {
+        r: (pitchR * frac).toFixed(1),
+        class: 'gear-ring-detail',
+        stroke: strokeCol,
+      }, anim);
+    });
+
+    // -- Tick marks & roman numerals ring --
+    el('circle', { r: tickR.toFixed(1), class: 'gear-tick-ring', stroke: strokeCol }, anim);
+
+    const ROM = ['XII','I','II','III','IV','V','VI','VII','VIII','IX','X','XI'];
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * TAU - Math.PI / 2;
+      const major = i % 5 === 0;
+      const r1 = tickR + pitchR * 0.05;
+      const r2 = tickR - (major ? pitchR * 0.06 : pitchR * 0.03);
+      el('line', {
+        x1: (r1 * Math.cos(a)).toFixed(2), y1: (r1 * Math.sin(a)).toFixed(2),
+        x2: (r2 * Math.cos(a)).toFixed(2), y2: (r2 * Math.sin(a)).toFixed(2),
+        class: major ? 'gear-tick major' : 'gear-tick',
+        stroke: strokeCol,
+      }, anim);
+
+      // Roman numerals only on the larger gold gear
+      if (major && isGold) {
+        const nr = tickR - pitchR * 0.13;
+        const t = el('text', {
+          x: (nr * Math.cos(a)).toFixed(2),
+          y: (nr * Math.sin(a)).toFixed(2),
+          class: 'gear-numeral',
+          fill: strokeCol,
+          'font-size': `${(pitchR * 0.1).toFixed(1)}px`,
+        }, anim);
+        t.textContent = ROM[i / 5];
+      }
+    }
+
+    // -- Spokes --
+    const nSpokes = isGold ? 8 : 6;
+    for (let i = 0; i < nSpokes; i++) {
+      const a = (i / nSpokes) * TAU;
+      el('line', {
+        x1: (hubR * Math.cos(a)).toFixed(1), y1: (hubR * Math.sin(a)).toFixed(1),
+        x2: (innerR * Math.cos(a)).toFixed(1), y2: (innerR * Math.sin(a)).toFixed(1),
+        class: 'gear-spoke-line', stroke: strokeCol,
+      }, anim);
+    }
+
+    // -- Hub --
+    el('circle', {
+      r: (hubR * 1.4).toFixed(1),
+      class: 'gear-hub-outer',
+      fill: `url(#${gradId})`, stroke: strokeCol,
+    }, anim);
+    el('circle', {
+      r: (hubR * 0.5).toFixed(1),
+      class: 'gear-hub-inner',
+      fill: strokeCol, stroke: strokeCol, opacity: '0.4',
+    }, anim);
+
+    // -- Text overlay (does NOT rotate — placed directly on container) --
+    if (label) {
+      const lg = el('g', { class: 'gear-label' }, container);
+      const placeMap = { '1st': 'I', '2nd': 'II', '3rd': 'III' };
+
+      el('text', {
+        x: 0, y: (-pitchR * 0.22).toFixed(1),
+        class: 'gear-place',
+        fill: label.textColor,
+        'font-size': `${isGold ? 11 : 9}px`,
+      }, lg).textContent = placeMap[label.place] || '';
+
+      const displayName = label.name.length > (isGold ? 18 : 13)
+        ? label.name.slice(0, isGold ? 16 : 11) + '…'
+        : label.name;
+
+      el('text', {
+        x: 0, y: (pitchR * 0.02).toFixed(1),
+        class: 'gear-name',
+        fill: label.textColor,
+        'font-size': `${isGold ? 15 : 11}px`,
+      }, lg).textContent = displayName;
+
+      el('text', {
+        x: 0, y: (pitchR * 0.2).toFixed(1),
+        class: 'gear-score',
+        fill: label.textColor,
+        'font-size': `${isGold ? 12 : 9}px`,
+      }, lg).textContent = `${label.score.toLocaleString()} pts`;
+    }
+  }
+
+  let lastStandings = null;
+
+  /* ---- Build the full podium SVG ---- */
+  function buildPodium(standings) {
+    lastStandings = standings;
+    const area = document.getElementById('podium-area');
+    area.innerHTML = '';
+
+    const w = vbR - vbL, h = vbB - vbT;
+    const svg = el('svg', {
+      viewBox: `${vbL.toFixed(0)} ${vbT.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}`,
+      class: 'podium-svg',
+      width: Math.min(w, 680).toFixed(0),
+      height: Math.min(h, 460).toFixed(0),
+      'aria-hidden': 'true',
+    });
+    area.appendChild(svg);
+
+    // Defs — metallic gradients + drop shadow
+    const d = el('defs', {}, svg);
+    d.innerHTML = `
+      <radialGradient id="goldGrad" cx="38%" cy="28%" r="72%">
+        <stop offset="0"   stop-color="var(--gold-light)"/>
+        <stop offset=".32" stop-color="var(--gold)"/>
+        <stop offset=".72" stop-color="var(--gold-dark)"/>
+        <stop offset="1"   stop-color="#5c4a1e"/>
+      </radialGradient>
+      <radialGradient id="silverGrad" cx="38%" cy="28%" r="72%">
+        <stop offset="0"   stop-color="var(--silver-light)"/>
+        <stop offset=".32" stop-color="var(--silver)"/>
+        <stop offset=".72" stop-color="var(--silver-dark)"/>
+        <stop offset="1"   stop-color="#48484e"/>
+      </radialGradient>
+      <radialGradient id="bronzeGrad" cx="38%" cy="28%" r="72%">
+        <stop offset="0"   stop-color="var(--bronze-light)"/>
+        <stop offset=".32" stop-color="var(--bronze)"/>
+        <stop offset=".72" stop-color="var(--bronze-dark)"/>
+        <stop offset="1"   stop-color="#3e2c1a"/>
+      </radialGradient>
+    `;
+
+    const isDark = document.body.classList.contains('theme-dark');
+
+    // Draw order: back gears first, gold on top
+    // Bronze — 3rd place, left
+    if (standings[2]) {
+      drawGear(svg, BX, BY, BRONZE_T, BRONZE_R, 'bronzeGrad',
+        'var(--bronze-dark)', -1, bronzeOffset,
+        { place: '3rd', name: standings[2].name, score: standings[2].score,
+          textColor: isDark ? '#dcba90' : '#3e2c1a' });
+    }
+
+    // Silver — 2nd place, right
+    if (standings[1]) {
+      drawGear(svg, SX, SY, SILVER_T, SILVER_R, 'silverGrad',
+        'var(--silver-dark)', -1, silverOffset,
+        { place: '2nd', name: standings[1].name, score: standings[1].score,
+          textColor: isDark ? '#d0d0d6' : '#2a2a30' });
+    }
+
+    // Gold — 1st place, centre (on top)
+    if (standings[0]) {
+      drawGear(svg, GX, GY, GOLD_T, GOLD_R, 'goldGrad',
+        'var(--gold-dark)', 1, 0,
+        { place: '1st', name: standings[0].name, score: standings[0].score,
+          textColor: isDark ? '#f0e09a' : '#3a2e10' });
+    }
+
+    updateSRTable(standings);
+  }
+
+  /* ---- Accessible table for screen readers ---- */
+  function updateSRTable(standings) {
+    const tbody = document.getElementById('sr-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    standings.forEach((s, i) => {
+      if (!s) return;
+      const tr = document.createElement('tr');
+      const d = document.createElement('td');
+      d.textContent = i + 1;
+      const n = document.createElement('td');
+      n.textContent = s.name;
+      const sc = document.createElement('td');
+      sc.textContent = s.score;
+      tr.append(d, n, sc);
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ---- Visible standings board ---- */
+  function updateVisibleTable(standings) {
+    const list = document.getElementById('standings-list');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    // Helper for roman numerals (up to 100 is usually enough for a scoreboard page like this, but let's use standard numbers for simplicity or roman for top 10)
+    const toRoman = (num) => {
+      const roman = { C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+      let str = '';
+      for (let i of Object.keys(roman)) {
+        let q = Math.floor(num / roman[i]);
+        num -= q * roman[i];
+        str += i.repeat(q);
+      }
+      return str || '0';
+    };
+
+    standings.forEach((s, i) => {
+      if (!s) return;
+      const li = document.createElement('li');
+      
+      const rank = document.createElement('div');
+      rank.className = 'standing-rank';
+      rank.textContent = toRoman(i + 1);
+      
+      const name = document.createElement('div');
+      name.className = 'standing-name';
+      name.textContent = s.name;
+      
+      const score = document.createElement('div');
+      score.className = 'standing-score';
+      score.textContent = s.score.toLocaleString() + ' pts';
+      
+      li.append(rank, name, score);
+      list.appendChild(li);
+    });
+  }
+
+  
+  function updateSRTable(standings) {}
+  function updateVisibleTable(standings) {}
+
+
+  // Expose buildPodium globally so Alpine can call it
+  window.buildPodium = buildPodium;
+  
+  // If Alpine already evaluated x-effect before this script loaded, render now
+  if (window.currentStandings) {
+    const loading = document.getElementById('podium-loading');
+    if (loading) loading.style.display = 'none';
+    buildPodium(window.currentStandings);
+  }
+})();
+
+</script>
+
   {{ Assets.js("assets/js/scoreboard.js") }}
 {% endblock %}

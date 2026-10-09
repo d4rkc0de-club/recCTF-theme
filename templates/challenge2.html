@@ -1,16 +1,18 @@
-<div x-data="{ currentTab: 'challenge' }">
-<div :class="getStyles()" class="ctf-modal-dialog" role="document" x-data="Challenge" x-init='id = {{ challenge.id }}; max_attempts = {{ max_attempts }}; attempts = {{ attempts }}; ratingValue = {{ (rating.get('value') if rating else None) | tojson }}; ratingReview = {{ (rating.get('review', '') if rating else None) | tojson }}; initClock();'>
-  <div class="custom-modal-content modal-dialog-inner">
-    <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+<div :class="getStyles()" class="modal-dialog ctf-modal-dialog" role="document" x-data="Challenge" x-init='id = {{ challenge.id }}; max_attempts = {{ max_attempts }}; attempts = {{ attempts }}; ratingValue = {{ (rating.get('value') if rating else None) | tojson }}; ratingReview = {{ (rating.get('review', '') if rating else None) | tojson }}; initClock();'>
+  <div class="modal-content modal-dialog-inner">
+    <button type="button" class="btn-close modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
         <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
       </svg>
     </button>
 
-    <div class="modal-header-tabs">
-      <ul class="tabs-nav" role="tablist" aria-label="Challenge Details">
+    
+
+    <div class="modal-body-content">
+      <div class="modal-header-tabs">
+      <ul class="tabs-nav nav" role="tablist" aria-label="Challenge Details">
         <li class="nav-item">
-          <button type="button" class="tab-btn"  :class="{ 'active': currentTab === 'challenge' }" @click.prevent="currentTab = 'challenge'; showChallenge(); rotateNotch(0)">
+          <button class="tab-btn nav-link active" data-bs-toggle="tab" data-bs-target="#challenge" @click="showChallenge(); rotateNotch(0)">
             {% trans %}Challenge{% endtrans %}
           </button>
         </li>
@@ -18,7 +20,7 @@
         {% block submissions %}
           {% if Configs.view_self_submissions %}
           <li class="nav-item">
-            <button type="button" class="tab-btn challenge-submissions"  :class="{ 'active': currentTab === 'submissions' }" @click.prevent="currentTab = 'submissions'; showSubmissions(); rotateNotch(1)">
+            <button class="tab-btn nav-link challenge-submissions" data-bs-toggle="tab" data-bs-target="#submissions" @click="showSubmissions(); rotateNotch(1)">
               {% if solves != None %}
                 Submissions
               {% endif %}
@@ -29,7 +31,7 @@
 
         {% block solution %}
           <li class="nav-item" x-show="getSolutionId()">
-            <button type="button" class="tab-btn challenge-solution"  :class="{ 'active': currentTab === 'solution' }" @click.prevent="currentTab = 'solution'; showSolution(); rotateNotch(2)">
+            <button class="tab-btn nav-link challenge-solution" data-bs-toggle="tab" data-bs-target="#solution" @click="showSolution(); rotateNotch(2)">
               {% trans %}Solution{% endtrans %}
             </button>
           </li>
@@ -38,7 +40,7 @@
         {% block solves %}
           {% if solves != None %}
           <li class="nav-item">
-            <button type="button" class="tab-btn challenge-solves"  :class="{ 'active': currentTab === 'solves' }" @click.prevent="currentTab = 'solves'; showSolves(); rotateNotch(3)">
+            <button class="tab-btn nav-link challenge-solves" data-bs-toggle="tab" data-bs-target="#solves" @click="showSolves(); rotateNotch(3)">
                 {{ ngettext("%(num)d Solve", "%(num)d Solves", solves) }}
             </button>
           </li>
@@ -50,13 +52,12 @@
         <path fill="none" stroke="currentColor" stroke-width="1.6" d="M -2.5,-8.5 L -2,-10.5 L 2,-10.5 L 2.5,-8.5 L 5,-7.5 L 7,-8.5 L 8.5,-7 L 7.5,-5 L 8.5,-2.5 L 10.5,-2 L 10.5,2 L 8.5,2.5 L 7.5,5 L 8.5,7 L 7,8.5 L 5,7.5 L 2.5,8.5 L 2,10.5 L -2,10.5 L -2.5,8.5 L -5,7.5 L -7,8.5 L -8.5,7 L -7.5,5 L -8.5,2.5 L -10.5,2 L -10.5,-2 L -8.5,-2.5 L -7.5,-5 L -8.5,-7 L -7,-8.5 L -5,-7.5 Z"></path><circle fill="none" stroke="currentColor" stroke-width="1.4" cx="0" cy="0" r="3"></circle>
       </svg>
     </div>
-
-    <div class="modal-body-content">
-      <div class="custom-tab-content">
-        <div role="tabpanel" class="custom-tab-pane" id="challenge" x-show="currentTab === 'challenge'">
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade show active" id="challenge">
+          
           <div class="challenge-header-emblem">
             <div class="mini-clock" id="mini-clock" aria-hidden="true">
-              <svg viewBox="-200 -200 400 400" class="clock-face mini-clock-face" style="stroke: #ffffff; fill: rgba(255,255,255,0.2);">
+              <svg viewBox="-200 -200 400 400" class="clock-face mini-clock-face" style="stroke: rgba(255,255,255,0.8); fill: rgba(255,255,255,0.1);">
                 <circle r="192" class="ring-outer" />
                 <circle r="150" class="ring thin" />
                 <circle r="62" class="ring thin dashed" />
@@ -88,7 +89,7 @@
                 <circle r="8" class="hub" />
               </svg>
             </div>
-            <h2 class="challenge-name custom-pt-3">
+            <h2 class="challenge-name pt-3">
               {{ challenge.name }}
             </h2>
             <h3 class="challenge-points">
@@ -101,7 +102,7 @@
           </i><span></span></div>
 
           {% if tags %}
-            <div class="challenge-tags custom-text-center pt-2 custom-pb-3" aria-label="Challenge Tags">
+            <div class="challenge-tags text-center pt-2 pb-3" aria-label="Challenge Tags">
               {% block tags %}
                 {% for tag in tags %}
                   <span class="tag-badge">{{ tag }}</span>
@@ -110,16 +111,16 @@
             </div>
           {% endif %}
 
-          <small class="challenge-author custom-text-center custom-d-block" style="color: rgba(255,255,255,0.8) !important;">
+          <small class="challenge-author text-center d-block" style="color: rgba(255,255,255,0.8) !important;">
             {% block attribution %}authored by {{ challenge.byline }}{% endblock %}
           </small>
 
           {% if Configs.challenge_ratings == "public" %}
-          <small class="challenge-ratings custom-text-center custom-d-block" style="color: rgba(255,255,255,0.8) !important;">
+          <small class="challenge-ratings text-center d-block" style="color: rgba(255,255,255,0.8) !important;">
             {% block ratings %}
               {% if ratings %}
                 <span><i class="fa-solid fa-thumbs-up"></i> {{ ratings.up }}</span>
-                <span class="custom-text-center custom-px-2">
+                <span class="text-center px-2">
                   {% if ratings.count %}
                   ({{ ((ratings.up / (ratings.count)) * 100) | int }}% liked)
                   {% endif %}
@@ -130,10 +131,10 @@
           </small>
           {% endif %}
 
-          <div class="challenge-desc custom-mt-3">{% block description %}{{ challenge.html }}{% endblock %}</div>
+          <div class="challenge-desc mt-3">{% block description %}{{ challenge.html }}{% endblock %}</div>
 
           {% if challenge.connection_info %}
-            <div class="custom-mb-2 challenge-connection">
+            <div class="mb-2 challenge-connection">
               {% block connection_info %}
                 {% set conn = challenge.connection_info %}
                 {% if not conn %}
@@ -148,7 +149,7 @@
 
           {% if hints %}
             <div class="challenge-hints hint-row row">
-              <div class="custom-col custom-mb-3">
+              <div class="col-12 mb-3">
               {% for hint in hints | sort(attribute="cost") %}
                 <div x-data="Hint" x-init="id = {{ hint.id }}">
                   {% if hint.content %}
@@ -173,9 +174,9 @@
           {% endif %}
 
           {% if files %}
-            <div class="row challenge-files custom-text-center custom-pb-3">
+            <div class="row challenge-files text-center pb-3">
               {% for file in files %}
-                <div class="custom-col-4 file-button-wrapper custom-d-block">
+                <div class="col-md-4 col-sm-4 col-xs-12 file-button-wrapper d-block">
                   {% set segments = file.split('/') %}
                   {% set token = file.split('?') | last %}
                   {% if token %}
@@ -232,10 +233,10 @@
           </div>
 
           <div class="row notification-row">
-            <div class="custom-col">
+            <div class="col-12">
               <template x-if="response">
                 {# This alert is re-used for all alerts, so it's important not to make it dismissible #}
-                <div class="submit-result-alert custom-w-100 custom-mt-3"
+                <div class="submit-result-alert w-100 mt-3"
                     :class="{
                       'alert-success': response.data.status == 'correct',
                       'alert-info': response.data.status == 'already_solved',
@@ -246,18 +247,18 @@
                   <strong x-text="response.data.message"></strong>
                   <div x-show="(response.data.status == 'correct' || response.data.status == 'already_solved')">
                     <div x-show="getNextId()">
-                      <button @click.prevent="nextChallenge()" class="btn-next-challenge custom-mt-3">
+                      <button @click="nextChallenge()" class="btn-next-challenge mt-3">
                         {% trans %}Next Challenge{% endtrans %}
                       </button>
                     </div>
 
                     {% if Configs.social_shares %}
                     <div>
-                      <button x-show="!share_url" @click.prevent="getShareUrl()" class="btn btn-sm btn-outline-info custom-mt-3">
+                      <button x-show="!share_url" @click="getShareUrl()" class="btn btn-sm btn-outline-info mt-3">
                         {% trans %}Share{% endtrans %}
                       </button>
-                      <div class="btn-group custom-mt-3" role="group" x-show="share_url">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" @click.prevent="copyShareUrl()" data-bs-toggle="tooltip" data-bs-title="Copied!">
+                      <div class="btn-group mt-3" role="group" x-show="share_url">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="copyShareUrl()" data-bs-toggle="tooltip" data-bs-title="Copied!">
                           <i class="fa-solid fa-copy"></i>
                         </button>
                         <a :href="'https://twitter.com/intent/tweet?url=' + encodeURIComponent(share_url)" role="button" class="btn btn-sm btn-outline-secondary" target="_blank">
@@ -274,39 +275,39 @@
                     {% endif %}
 
                     {% if Configs.challenge_ratings != "disabled" %}
-                    <div class="custom-mt-3">
+                    <div class="mt-3">
                       <hr>
-                      <div class="custom-text-center">
-                        <p class="custom-mb-2">{% trans %}Rate this challenge:{% endtrans %}</p>
-                        <div class="rating-buttons custom-mb-2" x-init="selectedRating = ratingValue || 0;">
+                      <div class="text-center">
+                        <p class="mb-2">{% trans %}Rate this challenge:{% endtrans %}</p>
+                        <div class="rating-buttons mb-2" x-init="selectedRating = ratingValue || 0;">
                           <button 
                             class="btn btn-outline-success me-2" 
                             :class="{ 'active': selectedRating === 1 }"
-                            @click.prevent="selectedRating = 1"
+                            @click="selectedRating = 1"
                           >
                             <i class="fa-solid fa-thumbs-up"></i>
                           </button>
                           <button 
                             class="btn btn-outline-danger" 
                             :class="{ 'active': selectedRating === -1 }"
-                            @click.prevent="selectedRating = -1"
+                            @click="selectedRating = -1"
                           >
                             <i class="fa-solid fa-thumbs-down"></i>
                           </button>
                         </div>
-                        <div class="custom-mt-3">
+                        <div class="mt-3">
                           <textarea 
-                            class="custom-input" 
+                            class="form-control" 
                             rows="2" 
                             x-model="ratingReview"
                             placeholder="{% trans %}Write a review (optional){% endtrans %}"
                             maxlength="2000"
                           ></textarea>
                         </div>
-                        <div class="custom-mt-3">
+                        <div class="mt-3">
                           <button 
-                            @click.prevent="submitRating()"
-                            class="custom-btn custom-btn-primary"
+                            @click="submitRating()"
+                            class="btn btn-primary"
                             :disabled="!selectedRating"
                           >
                             {% trans %}Submit{% endtrans %}
@@ -325,9 +326,9 @@
           </div>
         </div>
 
-        <div role="tabpanel" class="custom-tab-pane" id="submissions" x-cloak x-show="currentTab === 'submissions'">
-          <div class="custom-row">
-            <div class="custom-col">
+        <div role="tabpanel" class="tab-pane fade" id="submissions">
+          <div class="row">
+            <div class="col-md-12">
               <table class="data-table">
                 <thead>
                 <tr>
@@ -341,7 +342,7 @@
                   <tr>
                     <td x-data="{ truncate: true }">
                       <code x-text="truncate ? '*'.repeat(submission.provided.length) : submission.provided"></code>
-                      <button class="custom-btn-link p-0 pl-1" @click.prevent="truncate = !truncate">
+                      <button class="btn btn-link p-0 pl-1" @click="truncate = !truncate">
                         <i :class="truncate ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                       </button>
                     </td>
@@ -355,9 +356,9 @@
           </div>
         </div>
 
-        <div role="tabpanel" class="custom-tab-pane" id="solves" x-cloak x-show="currentTab === 'solves'">
-          <div class="custom-row">
-            <div class="custom-col">
+        <div role="tabpanel" class="tab-pane fade" id="solves">
+          <div class="row">
+            <div class="col-md-12">
               <table class="data-table">
                 <thead>
                 <tr>
@@ -380,10 +381,10 @@
           </div>
         </div>
 
-        <div role="tabpanel" class="custom-tab-pane" id="solution" x-cloak x-show="currentTab === 'solution'">
-          <div class="custom-row">
-            <div class="custom-col">
-              <div class="solution-content custom-pt-3">
+        <div role="tabpanel" class="tab-pane fade" id="solution">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="solution-content pt-3">
                 <template x-if="solution">
                   <div x-html="solution" style="white-space: pre-wrap;">
                   </div>
@@ -399,44 +400,43 @@
 </div>
 
 <style>
-  /* Center the box vertically and horizontally, slightly pushed down if needed */
+  /* Make the modal float over the page without pushing content down */
   .ctf-modal-dialog {
-    position: relative !important;
-    margin: 120px auto !important; /* Positioned under the height of the top bar/button */
-    width: 100% !important;
-    max-width: 600px !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     z-index: 9999 !important;
-  }
-
-  /* Remove bullets and polish tabs */
-  .modal-header-tabs .tabs-nav {
-    list-style: none !important;
-    padding: 0 !important;
     margin: 0 !important;
-    display: flex;
-    justify-content: center; /* Center tabs horizontally */
-    align-items: center;
-    width: 100%;
+    width: 100% !important;
+    max-width: 600px !important; /* adjust as needed */
   }
 
-  .modal-header-tabs .nav-item {
-    list-style: none !important;
-    margin: 0 5px;
+  /* Fix the position: fixed issue on the tabs to bring them inside the box */
+  .modal-body-content .modal-header-tabs {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line-faint, rgba(255,255,255,0.1));
+    padding-bottom: 0.5rem;
   }
-
-  .modal-header-tabs .tab-btn {
-    text-align: center !important;
-  }
-
   
+  /* Make sure the nav is centered or looks decent inside the box */
+  .modal-body-content .tabs-nav {
+    display: flex;
+    justify-content: center;
+    position: relative !important;
+  }
 
-  /* Opaque box */
+  /* Force the box to be opaque */
   .modal-dialog-inner {
-    background-color: #1a1a1a !important; 
+    background-color: #1a1a1a !important; /* solid dark */
     opacity: 1 !important;
   }
 
-  /* Cross button */
+  /* Make sure the cross button is clickable and visible */
   .modal-close-btn {
     position: absolute !important;
     right: 15px !important;
@@ -448,142 +448,4 @@
     border: none !important;
   }
 
-  /* Custom Utilities to replace Bootstrap */
-  .custom-text-center { text-align: center !important; }
-  .custom-pt-3 { padding-top: 1rem !important; }
-  .custom-pb-3 { padding-bottom: 1rem !important; }
-  .custom-mt-3 { margin-top: 1rem !important; }
-  .custom-mb-2 { margin-bottom: 0.5rem !important; }
-  .custom-mb-3 { margin-bottom: 1rem !important; }
-  .custom-px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-  .custom-d-block { display: block !important; }
-  .custom-w-100 { width: 100% !important; }
-
-  /* Custom Grid */
-  .custom-row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
-  .custom-col { flex: 0 0 100%; max-width: 100%; padding-right: 15px; padding-left: 15px; box-sizing: border-box; }
-  .custom-col-4 { flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 15px; padding-left: 15px; box-sizing: border-box; }
-
-  /* Custom Forms & Buttons */
-  .custom-input { 
-    display: block; width: 100%; padding: 0.375rem 0.75rem; 
-    font-size: 1rem; line-height: 1.5; color: #fff; 
-    background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-    border-radius: 0.25rem; box-sizing: border-box;
-  }
-  .custom-btn {
-    display: inline-block; font-weight: 400; text-align: center; white-space: nowrap; 
-    vertical-align: middle; user-select: none; border: 1px solid transparent; 
-    padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; border-radius: 0.25rem; 
-    cursor: pointer;
-  }
-  .custom-btn-primary { color: #fff; background-color: #0d6efd; border-color: #0d6efd; }
-  .custom-btn-outline { color: #fff; border-color: #6c757d; background: transparent; }
-  .custom-btn-info { color: #fff; background-color: #0dcaf0; border-color: #0dcaf0; }
-  .custom-btn-link { font-weight: 400; color: #0d6efd; text-decoration: none; background: transparent; border: none; cursor: pointer; }
-  .custom-badge { display: inline-block; padding: 0.35em 0.65em; font-size: .75em; font-weight: 700; line-height: 1; color: #fff; background-color: #0dcaf0; border-radius: 0.25rem; }
-
-  [x-cloak] { display: none !important; }
-
-
-  /* Fix the scroll-to-top bug caused by Bootstrap's modal-open class */
-  body.modal-open {
-    overflow: auto !important;
-    padding-right: 0 !important;
-  }
-  
-  html.modal-open {
-    overflow: auto !important;
-  }
-
-  /* Just in case the parent container is causing the jump when focus is applied */
-  #challenge-window {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 999999 !important; /* Bring entire modal wrapper to the foreground over page buttons */
-  }
-
-
-  /* Fix the scroll-to-top bug caused by Bootstrap's modal-open class */
-  body.modal-open {
-    overflow: auto !important;
-    padding-right: 0 !important;
-  }
-  
-  html.modal-open {
-    overflow: auto !important;
-  }
-
-  /* Just in case the parent container is causing the jump when focus is applied */
-  #challenge-window {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 999999 !important; /* Bring entire modal wrapper to the foreground over page buttons */
-  }
-
-
-
-
-
-  /* Force the Challenge tab (first tab) to render over the other overlapping tabs */
-  .modal-header-tabs .tabs-nav .nav-item:nth-child(1) {
-    position: relative !important;
-    z-index: 100 !important;
-  }
-  .modal-header-tabs .tabs-nav .nav-item:nth-child(2) {
-    position: relative !important;
-    z-index: 90 !important;
-  }
-  .modal-header-tabs .tabs-nav .nav-item:nth-child(3) {
-    position: relative !important;
-    z-index: 80 !important;
-  }
-  .modal-header-tabs .tabs-nav .nav-item:nth-child(4) {
-    position: relative !important;
-    z-index: 70 !important;
-  }
-
 </style>
-</div>
-
-
-<script>
-  // Global patch to stop href="#" from jumping the page
-  document.querySelectorAll('a[href="#"]').forEach(el => {
-    // Only add if we haven't already patched it
-    if (!el.dataset.patched) {
-      el.dataset.patched = true;
-      el.addEventListener('click', (e) => {
-        // Prevent default only if it's purely a hash link
-        if (el.getAttribute('href') === '#') {
-          e.preventDefault();
-        }
-      });
-    }
-  });
-
-  // Attempt to restore scroll position if it just jumped
-  // We can't perfectly know where they were, but we can prevent future jumps
-  // by patching the Bootstrap modal-open class early.
-</script>
-
-
-<script>
-  // Global patch to stop href="#" from jumping the page
-  document.querySelectorAll('a[href="#"]').forEach(el => {
-    if (!el.dataset.patched) {
-      el.dataset.patched = true;
-      el.addEventListener('click', (e) => {
-        if (el.getAttribute('href') === '#') {
-          e.preventDefault();
-        }
-      });
-    }
-  });
-</script>

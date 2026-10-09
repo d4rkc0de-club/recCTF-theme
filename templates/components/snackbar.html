@@ -3,14 +3,16 @@
     id="ctfdio-snackbar-email-nudge"
     x-data 
     x-show="window.init.userId && !window.init.userVerified && localStorage.getItem('remind_email_verify') != window.init.userId && (!['/team', '/teams/join', '/teams/new'].includes(window.location.pathname) || window.init.teamId != null)"
-    class="alert alert-info alert-dismissible col-md-4 col-10 position-fixed text-center m-0 ctfdio-email-nudge" 
-    style="bottom: 45px; left: 50%; transform: translateX(-50%); z-index: 1040; display: none;" 
+    class="alert alert-info alert-dismissible col-md-5 col-11 position-fixed text-center m-0 ctfdio-email-nudge" 
+    style="bottom: 45px; left: 50%; transform: translateX(-50%); z-index: 1040; display: none; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 8px; box-shadow: 0 16px 40px -10px rgba(0,0,0,0.8);" 
     role="alert"
 >
-  <small>
-    <strong>Email Unconfirmed</strong><br>
-    <span>To confirm your email address please <a href="{{ url_for('auth.confirm', flow='init') }}">click here</a>.</span>
-  </small>
-  <button type="button" class="btn-close" @click="localStorage.setItem('remind_email_verify', window.init.userId); $el.parentElement.style.display = 'none';" aria-label="Close"></button>
+  <div class="d-flex align-items-center justify-content-between p-1">
+    <div class="flex-grow-1 text-center">
+      <strong class="font-serif d-block mb-1" style="font-size: 1.05rem;">{% trans %}Email Unconfirmed{% endtrans %}</strong>
+      <span class="auth-hint">{% trans %}To confirm your email address please{% endtrans %} <a href="{{ url_for('auth.confirm', flow='init') }}" class="auth-link">{% trans %}click here{% endtrans %}</a>.</span>
+    </div>
+    <button type="button" class="btn-close ms-2" @click="localStorage.setItem('remind_email_verify', window.init.userId); $el.parentElement.parentElement.style.display = 'none';" aria-label="Close"></button>
+  </div>
 </div>
 {% endif %}

@@ -1,72 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>{{ title or Configs.ctf_name }}</title>
+  <title>{% block title %}{{ title or Configs.ctf_name }}{% endblock %}</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="{{ Configs.ctf_small_icon }}" type="image/x-icon">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Roboto:wght@400;500&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+
   {{ meta | safe }}
 
   {% block stylesheets %}
-    {{ Assets.css("assets/scss/main.scss") }}
+  {{ Assets.css("assets/scss/main.scss") }}
   {% endblock %}
 
   {{ Plugins.styles }}
 
-  {{ Assets.js("assets/js/color_mode_switcher.js", type=None) }}
-
   <script type="text/javascript">
-      window.init = {
-          'urlRoot': "{{ request.script_root }}",
-          'csrfNonce': "{{ Session.nonce }}",
-          'userMode': "{{ Configs.user_mode }}",
-          'userId': {{ Session.id }},
-          'userName': {{ User.name | tojson }},
-          'userEmail': {{ User.email | tojson }},
-          'userVerified': {{ User.verified | tojson }},
-          'teamId': {{ Team.id | tojson }},
-          'teamName': {{ Team.name | tojson }},
-          'start': {{ Configs.start | tojson }},
-          'end': {{ Configs.end | tojson }},
-          'themeSettings': {{ Configs.theme_settings | tojson }},
-          'eventSounds': [
-            "/themes/core/static/sounds/notification.webm",
-            "/themes/core/static/sounds/notification.mp3",
-          ],
-      }
+    window.init = {
+      'urlRoot': "{{ request.script_root }}",
+      'csrfNonce': "{{ Session.nonce }}",
+      'userMode': "{{ Configs.user_mode }}",
+      'userId': {{ Session.id }},
+      'userName': {{ User.name | tojson }},
+      'userEmail': {{ User.email | tojson }},
+      'userVerified': {{ User.verified | tojson }},
+      'teamId': {{ Team.id | tojson }},
+      'teamName': {{ Team.name | tojson }},
+      'start': {{ Configs.start | tojson }},
+      'end': {{ Configs.end | tojson }},
+      'themeSettings': {{ Configs.theme_settings | tojson }},
+      'eventSounds': [
+        "/themes/core/static/sounds/notification.webm",
+        "/themes/core/static/sounds/notification.mp3",
+      ],
+    };
   </script>
 
   {{ Configs.theme_header }}
 </head>
-<body>
-{% include "components/navbar.html" %}
 
-<main role="main">
-  {% block content %}
-  {% endblock %}
-</main>
+<body class="theme-dark">
+  <!-- Clockwork backdrop: gears + clock face (decorative) -->
+  <div class="backdrop" aria-hidden="true">
+    <svg id="gears" class="gears" preserveAspectRatio="xMidYMid slice"></svg>
 
-{% include "components/snackbar.html" %}
-
-<footer class="footer">
-  <div class="container text-center">
-    <a href="https://ctfd.io" class="text-secondary">
-      <small class="text-muted">
-        {% trans %}Powered by CTFd{% endtrans %}
-      </small>
-    </a>
+    <div class="clock" id="clock">
+      <svg viewBox="-200 -200 400 400" class="clock-face">
+        <circle r="196" class="ring-outer" />
+        <circle r="188" class="ring" />
+        <circle r="150" class="ring thin" />
+        <circle r="62" class="ring thin dashed" />
+        <g id="clock-ticks"></g>
+        <g id="clock-numerals"></g>
+        <g class="hand hand-hour" id="hand-hour">
+          <path d="M-5 18 L-3 -96 L0 -104 L3 -96 L5 18 Z" />
+          <circle r="12" class="hand-ring" />
+        </g>
+        <g class="hand hand-min" id="hand-min">
+          <path d="M-3.5 22 L-2 -150 L0 -160 L2 -150 L3.5 22 Z" />
+        </g>
+        <g class="hand hand-sec" id="hand-sec">
+          <line y1="34" y2="-172" />
+          <circle cy="-130" r="6" class="hand-ring" />
+        </g>
+        <circle r="6" class="hub" />
+      </svg>
+    </div>
   </div>
-</footer>
 
-{% include "components/notifications.html" %}
+  {% include "components/navbar.html" %}
 
-{% block scripts %}
+  <main role="main">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  {% include "components/snackbar.html" %}
+  <!-- {% include "components/notifications.html" %} -->
+
+  <footer class="footer">
+    <div class="footer-container">
+      <a href="https://d4rkc0de.iiitd.edu.in" class="footer-link">
+        <small class="footer-text">
+          {% trans %}d4rkc0de // IIIT Delhi{% endtrans %}
+        </small>
+      </a>
+    </div>
+  </footer>
+  <!-- <script src="{{ url_for("views.themes", path="js/fluid.js") }}"></script> -->
+
+  {{ Assets.js("assets/js/fluid.js", type=None) }}
+  {{ Assets.js("assets/js/base.js", type=None) }}
+
+  {% block scripts %}
   {{ Assets.js("assets/js/page.js") }}
-{% endblock %}
+  {% endblock %}
 
-{{ Plugins.scripts }}
+  {{ Plugins.scripts }}
 
-{{ Configs.theme_footer }}
+  {{ Configs.theme_footer }}
 </body>
+
 </html>

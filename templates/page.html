@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container">
-    {{ content | safe }}
+<div class="container"
+  style="padding-top: clamp(84px, 12vh, 120px); padding-bottom: 4rem; position: relative; z-index: 1;">
+  <div class="row">
+    <div class="col-md-12">
+      {{ content | safe }}
+    </div>
   </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-  {{ Assets.js("assets/js/page.js") }}
+{{ Assets.js("assets/js/page.js") }}
 {% endblock %}

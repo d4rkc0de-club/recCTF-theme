@@ -1,0 +1,164 @@
+
+  <style>
+    main {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      color: #ffffff;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center !important;
+      align-items: center !important;
+      overflow: hidden;
+    }
+
+    /* Subtle background texture/overlay similar to the theme */
+    .backdrop {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+      z-index: 0;
+    }
+
+    /* Center container */
+    .timer-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 3rem 4rem;
+      background-color: rgba(26, 26, 26, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .timer-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    /* Monospace timer */
+    .timer-display {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 5rem;
+      font-weight: normal;
+      color: #ffffff;
+      letter-spacing: 2px;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .time-segment {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .time-value {
+      line-height: 1;
+    }
+
+    .time-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 0.5rem;
+      letter-spacing: 1px;
+    }
+
+    .separator {
+      color: rgba(255, 255, 255, 0.3);
+      padding-bottom: 1.5rem; /* align with numbers */
+    }
+
+    /* Optional decorative lines */
+    .decor-line {
+      width: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      margin: 2rem auto 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="backdrop"></div>
+
+  <div class="timer-container">
+    <div class="timer-title">Time Remaining</div>
+    
+    <div class="timer-display" id="timer">
+      <!-- Days -->
+      <div class="time-segment">
+        <span class="time-value" id="days">00</span>
+        <span class="time-label">Days</span>
+      </div>
+      <span class="separator">:</span>
+      
+      <!-- Hours -->
+      <div class="time-segment">
+        <span class="time-value" id="hours">00</span>
+        <span class="time-label">Hours</span>
+      </div>
+      <span class="separator">:</span>
+      
+      <!-- Minutes -->
+      <div class="time-segment">
+        <span class="time-value" id="minutes">00</span>
+        <span class="time-label">Mins</span>
+      </div>
+      <span class="separator">:</span>
+      
+      <!-- Seconds -->
+      <div class="time-segment">
+        <span class="time-value" id="seconds">00</span>
+        <span class="time-label">Secs</span>
+      </div>
+    </div>
+
+    <div class="decor-line"></div>
+  </div>
+
+  <script>
+    // Set the target date (e.g., 24 hours from now for demonstration)
+    // You can modify this to match Configs.end or any specific UTC date
+    const targetDate = new Date();
+    targetDate.setHours(targetDate.getHours() + 24);
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = String(days).padStart(2, '0');
+      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+    }
+
+    // Initialize and interval
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  </script>
+</body>

@@ -1,19 +1,15 @@
 <div>
   {% for info in infos %}
-    <div class="alert alert-info alert-dismissible text-center" role="alert">
-      <span>{{ info }}</span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true"></span>
-      </button>
+    <div class="alert alert-info alert-dismissible text-center d-flex align-items-center justify-content-between py-2 px-3 mb-3" role="alert">
+      <span class="flex-grow-1 text-center">{{ info }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   {% endfor %}
 
   {% for error in errors %}
-    <div class="alert alert-danger alert-dismissible text-center" role="alert">
-      <span>{{ error }}</span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true"></span>
-      </button>
+    <div class="alert alert-danger alert-dismissible text-center d-flex align-items-center justify-content-between py-2 px-3 mb-3" role="alert">
+      <span class="flex-grow-1 text-center">{{ error }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   {% endfor %}
 </div>

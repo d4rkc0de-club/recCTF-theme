@@ -1,61 +1,60 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="jumbotron">
-    <div class="container">
-      <h1>
-        {% trans %}Login{% endtrans %}
-      </h1>
-    </div>
-  </div>
+<div class="auth-stage">
+  <div class="auth-card">
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8 col offset-md-2 col-lg-6 offset-lg-3">
-        {% include "components/errors.html" %}
-
-        {% if integrations.mlc() %}
-          <a class="btn btn-secondary btn-lg btn-block w-100" href="{{ url_for('auth.oauth_login') }}">
-            Login with Major League Cyber
-          </a>
-
-          <hr>
-        {% endif %}
-
-        {% with form = Forms.auth.LoginForm() %}
-          <form method="post" accept-charset="utf-8">
-            <div class="mb-3">
-              <b>
-                {{ form.name.label(class="form-label") }}
-                <span class="text-danger">*</span>
-              </b>
-              {{ form.name(class="form-control", value=name, autocomplete="username email") }}
-            </div>
-
-            <div class="mb-3">
-              <b>
-                {{ form.password.label(class="form-label") }}
-                <span class="text-danger">*</span>
-              </b>
-              {{ form.password(class="form-control", value=password, autocomplete="current-password") }}
-            </div>
-
-            <div class="row pt-3">
-              <div class="col-6 col-md-8">
-                <a class="align-middle" href="{{ url_for('auth.reset_password') }}">
-                  {% trans %}Forgot your password?{% endtrans %}
-                </a>
-              </div>
-
-              <div class="col-6 col-md-4">
-                {{ form.submit(class="btn btn-block btn-primary w-100") }}
-              </div>
-            </div>
-
-            {{ form.nonce() }}
-          </form>
-        {% endwith %}
+    <div class="auth-header">
+      <div class="auth-gear-row" aria-hidden="true">
+        <svg class="auth-gear spin-cw" viewBox="-36 -36 72 72">
+          <path fill="none" stroke="currentColor" stroke-width="1.8"
+            d="M -5,-27 L -4,-33 L 4,-33 L 5,-27 L 13,-24 L 20,-28 L 26,-22 L 22,-15 L 27,-8 L 33,-7 L 33,7 L 27,8 L 22,15 L 26,22 L 20,28 L 13,24 L 5,27 L 4,33 L -4,33 L -5,27 L -13,24 L -20,28 L -26,22 L -22,15 L -27,8 L -33,7 L -33,-7 L -27,-8 L -22,-15 L -26,-22 L -20,-28 L -13,-24 Z"/>
+          <circle fill="none" stroke="currentColor" stroke-width="1.4" r="20"/>
+          <circle fill="none" stroke="currentColor" stroke-width="1.8" r="8"/>
+        </svg>
       </div>
+      <h1 class="auth-title">{% trans %}Login{% endtrans %}</h1>
+      <p class="auth-subtitle">{% trans %}Authenticate your timeline{% endtrans %}</p>
     </div>
+
+    {% include "components/errors.html" %}
+
+    {% if integrations.mlc() %}
+      <a class="auth-btn-secondary" href="{{ url_for('auth.oauth_login') }}">
+        {% trans %}Login with Major League Cyber{% endtrans %}
+      </a>
+      <div class="auth-divider"><span>or</span></div>
+    {% endif %}
+
+    {% with form = Forms.auth.LoginForm() %}
+      <form method="post" accept-charset="utf-8" class="auth-form">
+        <div class="auth-field">
+          <label class="auth-label">{{ form.name.label.text }} <span class="auth-required">*</span></label>
+          {{ form.name(class="auth-input", value=name, autocomplete="username email", placeholder="Username or Email") }}
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label">{{ form.password.label.text }} <span class="auth-required">*</span></label>
+          {{ form.password(class="auth-input", value=password, autocomplete="current-password", placeholder="Password") }}
+        </div>
+
+        <div class="auth-actions">
+          <a class="auth-link" href="{{ url_for('auth.reset_password') }}">{% trans %}Forgot password?{% endtrans %}</a>
+          {{ form.submit(class="auth-btn-primary") }}
+        </div>
+
+        {{ form.nonce() }}
+      </form>
+    {% endwith %}
+
+    {% if registration_visible() %}
+      <p class="auth-footer-text">
+        {% trans %}No account?{% endtrans %}
+        <a class="auth-link" href="{{ url_for('auth.register') }}">{% trans %}Register here{% endtrans %}</a>
+      </p>
+    {% endif %}
+
   </div>
+</div>
 {% endblock %}
+
